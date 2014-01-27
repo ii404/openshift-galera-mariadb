@@ -5,9 +5,9 @@ Architecture: noarch
 Display-Name: MariaDB Galera Cluster 5.5
 Description: MariaDB Galera Cluster is a distributed multi-user, multi-threaded SQL database server.
 Source-Url: https://github.com/andrewklau/openshift-galera-mariadb/archive/master.zip
-Version: '5.5'
+Version: '5.5.34'
 Versions:
-- '5.5'
+- '5.5.34'
 Cartridge-Version: 0.0.1
 Cartridge-Vendor: andrewklau
 License: GPL
@@ -109,5 +109,3 @@ Endpoints:
   - mysql
   - galera
 Install-Build-Required: false
-Compatible-Versions:
-- 0.0.1

@@ -2,7 +2,7 @@
 
 Summary:       Provides mariadb galera cluster support
 Name:          openshift-origin-cartridge-mariadb-galera
-Version:       0.0.1
+Version:       5.5
 Release:       1%{?dist}
 Group:         Network/Daemons
 License:       ASL 2.0
@@ -15,6 +15,8 @@ Requires:      MariaDB-client
 %if 0%{?rhel}
 Requires:      MariaDB-Galera-server
 Requires:      MariaDB-client
+Requires:      MariaDB-compat
+Requires:      galera
 %endif
 
 Requires:      rubygem(openshift-origin-node)
@@ -45,7 +47,7 @@ Provides mariadb galera cluster cartridge support to OpenShift. (Cartridge Forma
 %doc %{cartridgedir}/LICENSE
 
 %changelog
-* Mon Jan 27 2014 Andrew Lau <andrew@andrewklau.com> 0.0.1
+* Mon Jan 27 2014 Andrew Lau <andrew@andrewklau.com> 5.5
 - Added mariadb support for RHEL/EL with SCL
 - Added mariadb-galera support
 
