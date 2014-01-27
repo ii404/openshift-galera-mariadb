@@ -1,20 +1,20 @@
 %global cartridgedir %{_libexecdir}/openshift/cartridges/mariadb
 
-Summary:       Provides embedded mariadb support
-Name:          openshift-origin-cartridge-mariadb
-Version:       1.15.1
+Summary:       Provides mariadb galera cluster support
+Name:          openshift-origin-cartridge-mariadb-galera
+Version:       0.0.1
 Release:       1%{?dist}
 Group:         Network/Daemons
 License:       ASL 2.0
 URL:           http://www.openshift.com
-Source0:       http://mirror.openshift.com/pub/openshift-origin/source/%{name}/%{name}-%{version}.tar.gz
-Requires:      mariadb-server
-Requires:      mariadb-devel
+Source0:       https://github.com/andrewklau/openshift-galera-mariadb/archive/master.zip
+Requires:      MariaDB-Galera-server
+Requires:      MariaDB-client
 
-# For RHEL6 install mysql55 from SCL
+# For RHEL6 install mariadb from official repo to get Galera support
 %if 0%{?rhel}
-Requires:      mariadb55
-Requires:      mariadb55-mariadb-devel
+Requires:      MariaDB-Galera-server
+Requires:      MariaDB-client
 %endif
 
 Requires:      rubygem(openshift-origin-node)
@@ -22,7 +22,7 @@ Requires:      openshift-origin-node-util
 BuildArch:     noarch
 
 %description
-Provides mariadb cartridge support to OpenShift. (Cartridge Format V2)
+Provides mariadb galera cluster cartridge support to OpenShift. (Cartridge Format V2)
 
 %prep
 %setup -q
@@ -55,6 +55,10 @@ Provides mariadb cartridge support to OpenShift. (Cartridge Format V2)
 %doc %{cartridgedir}/LICENSE
 
 %changelog
+* Mon Jan 27 2014 Andrew Lau <andrew@andrewklau.com> 0.0.1
+- Added mariadb support for RHEL/EL
+- Added mariadb-galera support
+
 * Fri Sep 13 2013 Troy Dawson <tdawson@redhat.com> 1.15.1-1
 - Bump up version (tdawson@redhat.com)
 - Cartridge version bumps for 2.0.33 (ironcladlou@gmail.com)
