@@ -1,14 +1,14 @@
 ---
-Name: mariadb
+Name: mariadb-galera
 Cartridge-Short-Name: MARIADB
 Architecture: noarch
-Display-Name: MariaDB 5.5
-Description: MariaDB is a multi-user, multi-threaded SQL database server.
+Display-Name: MariaDB Galera Cluster 5.5
+Description: MariaDB Galera Cluster is a distributed multi-user, multi-threaded SQL database server.
 Version: '5.5'
 Versions:
 - '5.5'
-Cartridge-Version: 0.2.4
-Cartridge-Vendor: redhat
+Cartridge-Version: 0.0.1
+Cartridge-Vendor: andrewklau
 License: GPL
 Vendor: MariaDB Foundation
 Categories:
@@ -31,25 +31,82 @@ Cart-Data:
 - Key: connection_url
   Type: cart_data
   Description: MariaDB connection URL
+  
+- Key: OPENSHIFT_TMP_DIR
+  Type: environment
+  Description: "Directory to store application temporary files."
+- Key: OPENSHIFT_REPO_DIR
+  Type: environment
+  Description: "Application root directory where application files reside. This directory is reset every time you do a git-push"
+- Key: OPENSHIFT_MARIADB_PORT
+  Type: environment
+  Description: "Internal port to which the web-framework binds to."
+- Key: OPENSHIFT_MARIADB_IP
+  Type: environment
+  Description: "Internal IP to which the web-framework binds to."
+- Key: OPENSHIFT_APP_DNS
+  Type: environment
+  Description: "Fully qualified domain name for the application."
+- Key: OPENSHIFT_APP_NAME
+  Type: environment
+  Description: "Application name"
+- Key: OPENSHIFT_DATA_DIR
+  Type: environment
+  Description: "Directory to store application data files. Preserved across git-pushes. Not shared across gears."
+- Key: OPENSHIFT_APP_UUID
+  Type: environment
+  Description: "Unique ID which identified the application. Does not change between gears."
+- Key: OPENSHIFT_GEAR_UUID
+  Type: environment
+  Description: "Unique ID which identified the gear. This value changes between gears."
+- Key: OPENSHIFT_MARIADB_MAIN_NODE_ADDR
+  Type: environment
+  Description: "Address of the first gear"
+- Key: OPENSHIFT_MARIADB_ACTIVE_GEARS
+  Type: environment
+  Description: "Array of active gears running in the MariaDB Cluster - array format: $OPENSHIFT_GEAR_DNS:$DB_PROXY_PORT:$NODE_GALERA_PORT_1"
+  
 Suggests:
 - phpmyadmin-4
 Provides:
 - mariadb-5.5
-- mariadb
-- mariadb-singleton-master
+- MariaDB-Galera-server
+- MariaDB-client
 Publishes:
+  publish-mariadb-node:
+    Type: "NET_TCP:mariadb-cluster"
+  publish-mariadb-galera-node:
+    Type: "NET_TCP:mariadb-galera"
+  publish-mariadb-sst-node:
+    Type: "NET_TCP:mariadb-sst"
   publish-db-connection-info:
     Type: ENV:NET_TCP:db:connection-info
+Subscribes:
+  set-mariadb-node:
+    Type: "NET_TCP:mariadb-cluster"
+  set-mariadb-galera-node:
+    Type: "NET_TCP:mariadb-galera"
+  set-mariadb-sst-node:
+    Type: "NET_TCP:mariadb-sst"
 Scaling:
-  Min: 1
-  Max: 1
+  Min: 3
+  Max: -1
 Endpoints:
 - Private-IP-Name: DB_HOST
   Private-Port-Name: DB_PORT
   Private-Port: 3306
   Public-Port-Name: DB_PROXY_PORT
+- Private-IP-Name: DB_HOST
+  Private-Port-Name: GALERA_PORT_1
+  Private-Port:4567
+  Public-Port-Name: NODE_GALERA_PORT_1
+- Private-IP-Name: DB_HOST
+  Private-Port-Name: GALERA_PORT_2
+  Private-Port:4444
+  Public-Port-Name: NODE_GALERA_PORT_2
   Protocols:
   - mysql
+  - galera
 Install-Build-Required: false
 Compatible-Versions:
-- 0.2.3
+- 0.0.1

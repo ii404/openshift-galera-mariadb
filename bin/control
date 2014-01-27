@@ -33,7 +33,31 @@ function start {
   if ! is_running; then
     echo "Starting MariaDB cartridge"
     oo-erb conf/my.cnf.erb.hidden > conf/my.cnf
-    mysql_context "/usr/bin/mysqld_safe --defaults-file=$OPENSHIFT_MARIADB_DIR/conf/my.cnf" > /dev/null 2>&1 &
+    
+    # Dirty check to see if other hosts are up
+    active_gears=(`cat env/OPENSHIFT_MARIADB_GALERA_GEARS`)
+    online_gears=''
+    for i in ${active_gears[@]}; 
+    do 
+	# test if host is accessible
+	if nc -w 5 $(echo $i | tr ":" "\n") 2>/dev/null
+	then
+		online_gears="$online_gears,$i"
+	else
+		echo -e "Warning: $i is not responding! The node which hosts this gear may be offline - please contact your administrator."
+	fi
+    done
+    
+    # Generate the dynamic wsrep_cluster_addresses (none prints out as 1 - so we want at least 3 which means 2 are online)
+    if [ `echo $online_gears | sed 's/[^,]//g' | wc -c` -gt 2 ];
+    then
+    	# Adding more hosts to the cluster
+        mysql_context "/usr/bin/mysqld_safe --defaults-file=$OPENSHIFT_MARIADB_DIR/conf/my.cnf --wsrep_cluster_address=$online_gears" > /dev/null 2>&1 &
+    else
+    	# Initial Startup (first host)
+        mysql_context "/usr/bin/mysqld_safe --defaults-file=$OPENSHIFT_MARIADB_DIR/conf/my.cnf --wsrep_cluster_address='gcomm://'" > /dev/null 2>&1 &
+    fi
+
     wait_for_mysqld_availability
   else
     echo "MariaDB already running" 1>&2
