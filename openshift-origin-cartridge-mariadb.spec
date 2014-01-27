@@ -33,16 +33,6 @@ Provides mariadb galera cluster cartridge support to OpenShift. (Cartridge Forma
 %install
 %__mkdir -p %{buildroot}%{cartridgedir}
 %__cp -r * %{buildroot}%{cartridgedir}
-%if 0%{?fedora}%{?rhel} <= 6
-%__mv %{buildroot}%{cartridgedir}/metadata/manifest.yml %{buildroot}%{cartridgedir}/metadata/manifest.yml
-%__mv %{buildroot}%{cartridgedir}/lib/mysql_context.rhel %{buildroot}%{cartridgedir}/lib/mysql_context
-%__rm %{buildroot}%{cartridgedir}/lib/mysql_context.f19
-%endif
-%if 0%{?fedora} == 19
-%__mv %{buildroot}%{cartridgedir}/metadata/manifest.yml %{buildroot}%{cartridgedir}/metadata/manifest.yml
-%__mv %{buildroot}%{cartridgedir}/lib/mysql_context.fc19 %{buildroot}%{cartridgedir}/lib/mysql_context
-%__rm %{buildroot}%{cartridgedir}/lib/mysql_context.rhel
-%endif
 %__rm %{buildroot}%{cartridgedir}/metadata/manifest.yml.*
  
 
@@ -56,7 +46,7 @@ Provides mariadb galera cluster cartridge support to OpenShift. (Cartridge Forma
 
 %changelog
 * Mon Jan 27 2014 Andrew Lau <andrew@andrewklau.com> 0.0.1
-- Added mariadb support for RHEL/EL
+- Added mariadb support for RHEL/EL with SCL
 - Added mariadb-galera support
 
 * Fri Sep 13 2013 Troy Dawson <tdawson@redhat.com> 1.15.1-1
