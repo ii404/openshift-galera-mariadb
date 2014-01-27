@@ -8,8 +8,14 @@ Group:         Network/Daemons
 License:       ASL 2.0
 URL:           http://www.openshift.com
 Source0:       http://mirror.openshift.com/pub/openshift-origin/source/%{name}/%{name}-%{version}.tar.gz
-Requires:      MariaDB-Galera-server               
-Requires:      MariaDB-client
+Requires:      mariadb-server
+Requires:      mariadb-devel
+
+# For RHEL6 install mysql55 from SCL
+%if 0%{?rhel}
+Requires:      mariadb55
+Requires:      mariadb55-mariadb-devel
+%endif
 
 Requires:      rubygem(openshift-origin-node)
 Requires:      openshift-origin-node-util
