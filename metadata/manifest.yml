@@ -98,11 +98,11 @@ Endpoints:
   Public-Port-Name: DB_PROXY_PORT
 - Private-IP-Name: DB_HOST
   Private-Port-Name: GALERA_PORT_1
-  Private-Port:4567
+  Private-Port: 4567
   Public-Port-Name: NODE_GALERA_PORT_1
 - Private-IP-Name: DB_HOST
   Private-Port-Name: GALERA_PORT_2
-  Private-Port:4444
+  Private-Port: 4444
   Public-Port-Name: NODE_GALERA_PORT_2
   Protocols:
   - mysql
