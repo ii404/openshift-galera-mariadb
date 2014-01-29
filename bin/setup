@@ -16,7 +16,7 @@ mkdir -p $OPENSHIFT_MARIADB_DIR/mariadb
 cd $OPENSHIFT_MARIADB_DIR/versions/$version/
 wget http://mirror.aarnet.edu.au/pub/MariaDB/mariadb-galera-5.5.34/kvm-bintar-hardy-amd64/mariadb-galera-5.5.34-linux-x86_64.tar.gz
 
-tar xzf $OPENSHIFT_MARIADB_DIR/versions/$version/mariadb-galera$version-linux-x86_64.tar.gz --strip-components=1 -C $OPENSHIFT_MARIADB_DIR/mariadb/
+tar xzf $OPENSHIFT_MARIADB_DIR/versions/$version/mariadb-galera-$version-linux-x86_64.tar.gz --strip-components=1 -C $OPENSHIFT_MARIADB_DIR/mariadb/
 
 cp -Hr $OPENSHIFT_MARIADB_DIR/versions/$version/conf/* $OPENSHIFT_MARIADB_DIR/mariadb/conf
 ln -s $OPENSHIFT_MARIADB_DIR/versions/$version/lib $OPENSHIFT_MARIADB_DIR/lib
