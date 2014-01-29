@@ -1,7 +1,6 @@
 #!/bin/bash -e
 
 source $OPENSHIFT_CARTRIDGE_SDK_BASH
-#source "$OPENSHIFT_MARIADB_DIR/versions/$version/lib/mysql_context"
 
 case "$1" in
   -v|--version)
@@ -26,4 +25,6 @@ mkdir -p $OPENSHIFT_MARIADB_DIR/{log,pid,socket,data,run}
 
 cp conf/my.cnf.erb conf/my.cnf.erb.hidden
 
+
+source "$OPENSHIFT_MARIADB_DIR/lib/mysql_context"
 update_configuration $version
