@@ -12,7 +12,8 @@ esac
 # extract mariadb binary file
 mkdir -p $OPENSHIFT_MARIADB_DIR/mariadb
 
-# grab the binary from mariadb.org mirror - I'm not sure if this'll work because of the timeout limitation
+# grab the binary from mariadb.org mirror
+mkdir $OPENSHIFT_MARIADB_DIR/versions/$version/
 cd $OPENSHIFT_MARIADB_DIR/versions/$version/
 wget http://mirror.aarnet.edu.au/pub/MariaDB/mariadb-galera-5.5.34/kvm-bintar-hardy-amd64/mariadb-galera-5.5.34-linux-x86_64.tar.gz
 
