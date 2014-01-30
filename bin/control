@@ -35,7 +35,7 @@ function start {
     oo-erb $OPENSHIFT_MARIADB_DIR/conf/my.cnf.erb.hidden > $OPENSHIFT_MARIADB_DIR/conf/my.cnf
     
     # Dirty check to see if other hosts are up
-    active_gears=(`cat env/OPENSHIFT_MARIADB_GALERA_GEARS`)
+    active_gears=(`cat $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_GALERA_GEARS`)
     online_gears=''
     for i in ${active_gears[@]}; 
     do 
