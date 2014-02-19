@@ -44,12 +44,15 @@ function start {
 	then
 		online_gears="$online_gears,$i"
 	else
+		# Not sure if this will report to the user...
 		echo -e "Warning: $i is not responding! The node which hosts this gear may be offline - please contact your administrator."
 	fi
     done
+        
+    # We MUST run mysqld_safe from this dir or else it will fail
+    cd $OPENSHIFT_MARIADB_DIR/mariadb
     
     # Generate the dynamic wsrep_cluster_addresses (none prints out as 1 - so we want at least 3 which means 2 are online)
-    cd $OPENSHIFT_MARIADB_DIR/mariadb
     if [ `echo $online_gears | sed 's/[^,]//g' | wc -c` -gt 2 ];
     then
     	# Adding more hosts to the cluster
