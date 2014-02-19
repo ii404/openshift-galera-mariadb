@@ -19,6 +19,12 @@ wget http://mirror.aarnet.edu.au/pub/MariaDB/mariadb-galera-5.5.34/kvm-bintar-ha
 
 tar xzf $OPENSHIFT_MARIADB_DIR/versions/$version/mariadb-galera-$version-linux-x86_64.tar.gz --strip-components=1 -C $OPENSHIFT_MARIADB_DIR/mariadb/
 
+# Lets try clean up the binary contents to quotas don't complain
+rm -rf $OPENSHIFT_MARIADB_DIR/mariadb/mysql-test
+rm -rf $OPENSHIFT_MARIADB_DIR/mariadb/sql-bench
+rm -rf $OPENSHIFT_MARIADB_DIR/mariadb/man
+
+
 #cp -Hr $OPENSHIFT_MARIADB_DIR/versions/$version/conf $OPENSHIFT_MARIADB_DIR/conf
 #ln -s $OPENSHIFT_MARIADB_DIR/versions/$version/lib $OPENSHIFT_MARIADB_DIR/lib
 
