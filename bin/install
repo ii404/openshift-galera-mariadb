@@ -35,7 +35,7 @@ echo 'Installing mariadb'
 mariadb_data_dir="${OPENSHIFT_MARIADB_DIR}/data"
 
 # Must be invoked with absolute path to avoid a mariadb bug involving my_print_defaults
-mysql_context "$OPENSHIFT_MARIADB_DIR/mariadb/bin/mysql_install_db --datadir=${mariadb_data_dir} --user=${USER}" || error 'Failed to create mariadb database', 119
+mysql_context "$OPENSHIFT_MARIADB_DIR/mariadb/scripts/mysql_install_db --datadir=${mariadb_data_dir} --user=${USER}" || error 'Failed to create mariadb database', 119
 
 client_result ""
 client_result "MariaDB ${OPENSHIFT_MARIADB_VERSION} database added.  Please make note of these credentials:"
