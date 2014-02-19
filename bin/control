@@ -39,8 +39,10 @@ function start {
     online_gears=''
     for i in ${active_gears[@]}; 
     do 
-	# test if host is accessible
-	if nc -w 5 $(echo $i | tr ":" "\n") 2>/dev/null
+	# test if host is accessible (nc not available)
+	# if nc -w 5 $(echo $i | tr ":" "\n") 2>/dev/null
+	echo "quit" | telnet $(echo $i | tr ":" "\n") | grep Connected > /dev/null 2>&1
+	if [ "$?" -ne "1" ]; then #Ok
 	then
 		online_gears="$online_gears,$i"
 	else
