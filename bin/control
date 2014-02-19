@@ -7,7 +7,7 @@ export STOPTIMEOUT=10
 
 # Run mariadb commands
 function run_sql {
-  echo "$@" | mysql_context "$OPENSHIFT_MARIADB_DIR/mariadb/bin/mysql -h $OPENSHIFT_MARIADB_DB_HOST -P $OPENSHIFT_MARIADB_DB_PORT -u $OPENSHIFT_MARIADB_DB_USERNAME --password='$OPENSHIFT_MARIADB_DB_PASSWORD' --skip-column-names"
+  echo "$@" | mysql_context "$OPENSHIFT_MARIADB_DIR/mariadb/bin/mysql --basedir=$OPENSHIFT_MARIADB_DIR/mariadb/ -h $OPENSHIFT_MARIADB_DB_HOST -P $OPENSHIFT_MARIADB_DB_PORT -u $OPENSHIFT_MARIADB_DB_USERNAME --password='$OPENSHIFT_MARIADB_DB_PASSWORD' --skip-column-names"
 }
 
 function is_running {
@@ -49,13 +49,14 @@ function start {
     done
     
     # Generate the dynamic wsrep_cluster_addresses (none prints out as 1 - so we want at least 3 which means 2 are online)
+    cd $OPENSHIFT_MARIADB_DIR/mariadb
     if [ `echo $online_gears | sed 's/[^,]//g' | wc -c` -gt 2 ];
     then
     	# Adding more hosts to the cluster
-        mysql_context "$OPENSHIFT_MARIADB_DIR/mariadb/bin/mysqld_safe --defaults-file=$OPENSHIFT_MARIADB_DIR/conf/my.cnf --wsrep_cluster_address=$online_gears" > /dev/null 2>&1 &
+        mysql_context "./bin/mysqld_safe --defaults-file=$OPENSHIFT_MARIADB_DIR/conf/my.cnf --wsrep_cluster_address=$online_gears --user=${USER}" > /dev/null 2>&1 &
     else
     	# Initial Startup (first host)
-        mysql_context "$OPENSHIFT_MARIADB_DIR/mariadb/bin/mysqld_safe --defaults-file=$OPENSHIFT_MARIADB_DIR/conf/my.cnf --wsrep_cluster_address='gcomm://'" > /dev/null 2>&1 &
+        mysql_context "./bin/mysqld_safe --defaults-file=$OPENSHIFT_MARIADB_DIR/conf/my.cnf --wsrep_cluster_address='gcomm://' --user=${USER}" > /dev/null 2>&1 &
     fi
 
     wait_for_mysqld_availability
