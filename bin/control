@@ -42,7 +42,7 @@ function start {
 	# test if host is accessible (nc not available)
 	# if nc -w 5 $(echo $i | tr ":" "\n") 2>/dev/null
 	echo "quit" | telnet $(echo $i | tr ":" "\n") | grep Connected > /dev/null 2>&1
-	if [ "$?" -ne "1" ]; then #Ok
+	if [ "$?" -ne "1" ]; #Ok
 	then
 		online_gears="$online_gears,$i"
 	else
