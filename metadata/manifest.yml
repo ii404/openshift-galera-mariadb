@@ -90,7 +90,7 @@ Subscribes:
   set-mariadb-sst-node:
     Type: "NET_TCP:mariadb-sst"
 Scaling:
-  Min: 3
+  Min: 2
   Max: -1
 Endpoints:
 - Private-IP-Name: DB_HOST
