@@ -54,14 +54,14 @@ function start {
     # We MUST run mysqld_safe from this dir or else it will fail
     cd $OPENSHIFT_MARIADB_DIR/mariadb
     
-    # Generate the dynamic wsrep_cluster_addresses (none prints out as 1 - so we want at least 3 which means 2 are online)
-    if [ `echo $online_gears | sed 's/[^,]//g' | wc -c` -gt 2 ];
+    # Generate the dynamic wsrep_cluster_addresses (none prints out as 1)
+    if [ `echo $online_gears | sed 's/[^,]//g' | wc -c` -lt 2 ];
     then
-    	# Adding more hosts to the cluster
-        mysql_context "./bin/mysqld_safe --defaults-file=$OPENSHIFT_MARIADB_DIR/conf/my.cnf --wsrep_cluster_address=$online_gears" > /dev/null 2>&1 &
-    else
     	# Initial Startup (first host)
         mysql_context "./bin/mysqld_safe --defaults-file=$OPENSHIFT_MARIADB_DIR/conf/my.cnf --wsrep_cluster_address='gcomm://'" > /dev/null 2>&1 &
+    else
+    	# Adding more hosts to the cluster
+        mysql_context "./bin/mysqld_safe --defaults-file=$OPENSHIFT_MARIADB_DIR/conf/my.cnf --wsrep_cluster_address=$online_gears" > /dev/null 2>&1 &
     fi
 
     wait_for_mysqld_availability
