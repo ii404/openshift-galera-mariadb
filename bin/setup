@@ -24,6 +24,11 @@ rm -rf $OPENSHIFT_MARIADB_DIR/mariadb/mysql-test
 rm -rf $OPENSHIFT_MARIADB_DIR/mariadb/sql-bench
 rm -rf $OPENSHIFT_MARIADB_DIR/mariadb/man
 
+# Lets grab galera
+mkdir $OPENSHIFT_MARIADB_DIR/galera
+cd $OPENSHIFT_MARIADB_DIR/galera
+wget https://launchpad.net/galera/2.x/25.2.8/+download/galera-25.2.8-1.rhel6.x86_64.rpm
+rpm2cpio galera-25.2.8-1.rhel6.x86_64.rpm | cpio -idmv
 
 #cp -Hr $OPENSHIFT_MARIADB_DIR/versions/$version/conf $OPENSHIFT_MARIADB_DIR/conf
 #ln -s $OPENSHIFT_MARIADB_DIR/versions/$version/lib $OPENSHIFT_MARIADB_DIR/lib
