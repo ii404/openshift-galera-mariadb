@@ -62,7 +62,8 @@ interactive-timeout
 # wsrep_cluster_address=gcomm://db01.example.com
 
 # Use the provider we downloaded earlier
-wsrep_provider=<%= ENV['OPENSHIFT_MARIADB_DIR'] %>/galera/usr/lib64/galera/libgalera_smm.so
+#wsrep_provider=<%= ENV['OPENSHIFT_MARIADB_DIR'] %>/galera/usr/lib64/galera/libgalera_smm.so
+wsrep_provider=none
 
 wsrep_cluster_name=<%= ENV['OPENSHIFT_APP_NAME'] %>
 
