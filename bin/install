@@ -39,7 +39,7 @@ echo 'Installing mariadb'
 mariadb_data_dir="${OPENSHIFT_MARIADB_DIR}/data"
 
 # basedir is important because we're using the downloaded binary
-mysql_context "$OPENSHIFT_MARIADB_DIR/binaries/mariadb/scripts/mysql_install_db --basedir=$OPENSHIFT_MARIADB_DIR/binaries/mariadb/ --datadir=${mariadb_data_dir} --user=${USER}" || error 'Failed to create mariadb database', 119
+mysql_context "$OPENSHIFT_MARIADB_DIR/binaries/mariadb/scripts/mysql_install_db --basedir=$OPENSHIFT_MARIADB_DIR/binaries/mariadb/ --datadir=${mariadb_data_dir}" || error 'Failed to create mariadb database', 119
 
 client_result ""
 client_result "MariaDB Galera Cluster ${OPENSHIFT_MARIADB_VERSION} database added.  Please make note of these credentials:"
