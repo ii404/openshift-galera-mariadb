@@ -14,7 +14,11 @@ esac
 env_dir="${OPENSHIFT_MARIADB_DIR}/env"
 set_env_var 'OPENSHIFT_MARIADB_VERSION' $version $env_dir
 export OPENSHIFT_MARIADB_VERSION=$version
- 
+
+# Check if this is the first host in cluster
+if [ `wc -l $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_NODE_GEARS` -lt 2 ]
+then
+	
 # Generate username, password, and db name and create env variables
 echo 'Generating username and password'
 
@@ -54,3 +58,26 @@ cart_props "connection_url=mysql://$OPENSHIFT_MARIADB_DB_HOST:$OPENSHIFT_MARIADB
 cart_props "username=$username"
 cart_props "password=$password"
 cart_props "database_name=$OPENSHIFT_APP_NAME"
+
+
+## Now Start the new_cluster
+mysql_context "./bin/mysqld_safe --defaults-file=$OPENSHIFT_MARIADB_DIR/conf/my.cnf --wsrep_node_address="$OPENSHIFT_GEAR_DNS" --wsrep_node_incoming_address="$OPENSHIFT_GEAR_DNS" --wsrep_new_cluster --wsrep_cluster_address='gcomm://'" > /dev/null 2>&1 &
+
+## Clean Up
+echo "drop database test;
+create database \`${dbname}\` DEFAULT CHARACTER SET utf8 DEFAULT COLLATE utf8_general_ci;" | mysql_context "$OPENSHIFT_MARIADB_DIR/mariadb/bin/mysql -u root -S '$socket_file'" > /dev/null || error 'Failed to create database' 188
+
+echo "                                  
+delete from user;
+grant all on *.* to '$username'@'$OPENSHIFT_MARIADB_DB_HOST' identified by '$password' with grant option;
+grant all on *.* to '$username'@'%' identified by '$password' with grant option;
+flush privileges;" | mysql_context "$OPENSHIFT_MARIADB_DIR/mariadb/bin/mysql -u root -S '$socket_file' mysql" > /dev/null || error "Failed to setup initial root user" 187
+
+# Restart MariaDB
+$OPENSHIFT_MARIADB_DIR/bin/control restart
+
+else
+	# Join the cluster
+	$OPENSHIFT_MARIADB_DIR/bin/control start
+
+fi
