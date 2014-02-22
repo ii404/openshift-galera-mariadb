@@ -39,7 +39,7 @@ echo 'Installing mariadb'
 mariadb_data_dir="${OPENSHIFT_MARIADB_DIR}/data"
 
 # basedir is important because we're using the downloaded binary
-mysql_context "$OPENSHIFT_MARIADB_DIR/mariadb/scripts/mysql_install_db --basedir=$OPENSHIFT_MARIADB_DIR/mariadb/ --datadir=${mariadb_data_dir} --user=${USER}" || error 'Failed to create mariadb database', 119
+mysql_context "$OPENSHIFT_MARIADB_DIR/binaries/mariadb/scripts/mysql_install_db --basedir=$OPENSHIFT_MARIADB_DIR/binaries/mariadb/ --datadir=${mariadb_data_dir} --user=${USER}" || error 'Failed to create mariadb database', 119
 
 client_result ""
 client_result "MariaDB Galera Cluster ${OPENSHIFT_MARIADB_VERSION} database added.  Please make note of these credentials:"
@@ -65,13 +65,13 @@ mysql_context "./bin/mysqld_safe --defaults-file=$OPENSHIFT_MARIADB_DIR/conf/my.
 
 ## Clean Up
 echo "drop database test;
-create database \`${dbname}\` DEFAULT CHARACTER SET utf8 DEFAULT COLLATE utf8_general_ci;" | mysql_context "$OPENSHIFT_MARIADB_DIR/mariadb/bin/mysql -u root -S '$socket_file'" > /dev/null || error 'Failed to create database' 188
+create database \`${dbname}\` DEFAULT CHARACTER SET utf8 DEFAULT COLLATE utf8_general_ci;" | mysql_context "$OPENSHIFT_MARIADB_DIR/binaries/mariadb/bin/mysql -u root -S '$socket_file'" > /dev/null || error 'Failed to create database' 188
 
 echo "                                  
 delete from user;
 grant all on *.* to '$username'@'$OPENSHIFT_MARIADB_DB_HOST' identified by '$password' with grant option;
 grant all on *.* to '$username'@'%' identified by '$password' with grant option;
-flush privileges;" | mysql_context "$OPENSHIFT_MARIADB_DIR/mariadb/bin/mysql -u root -S '$socket_file' mysql" > /dev/null || error "Failed to setup initial root user" 187
+flush privileges;" | mysql_context "$OPENSHIFT_MARIADB_DIR/binaries/mariadb/bin/mysql -u root -S '$socket_file' mysql" > /dev/null || error "Failed to setup initial root user" 187
 
 # Restart MariaDB
 $OPENSHIFT_MARIADB_DIR/bin/control restart

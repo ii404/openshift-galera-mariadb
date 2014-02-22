@@ -7,7 +7,7 @@ export STOPTIMEOUT=10
 
 # Run mariadb commands
 function run_sql {
-  echo "$@" | mysql_context "$OPENSHIFT_MARIADB_DIR/mariadb/bin/mysql --basedir=$OPENSHIFT_MARIADB_DIR/mariadb/ -h $OPENSHIFT_MARIADB_DB_HOST -P $OPENSHIFT_MARIADB_DB_PORT -u $OPENSHIFT_MARIADB_DB_USERNAME --password='$OPENSHIFT_MARIADB_DB_PASSWORD' --skip-column-names"
+  echo "$@" | mysql_context "$OPENSHIFT_MARIADB_DIR/binaries/mariadb/bin/mysql --basedir=$OPENSHIFT_MARIADB_DIR/binaries/mariadb/ -h $OPENSHIFT_MARIADB_DB_HOST -P $OPENSHIFT_MARIADB_DB_PORT -u $OPENSHIFT_MARIADB_DB_USERNAME --password='$OPENSHIFT_MARIADB_DB_PASSWORD' --skip-column-names"
 }
 
 function is_running {
@@ -52,7 +52,7 @@ function start {
     done
         
     # We MUST run mysqld_safe from this dir or else it will fail
-    cd $OPENSHIFT_MARIADB_DIR/mariadb
+    cd $OPENSHIFT_MARIADB_DIR/binaries/mariadb
     
     # Generate the dynamic wsrep_cluster_addresses (none prints out as 1 - so we want at least 3 which means 2 are online)
     if [ `echo $online_gears | sed 's/[^,]//g' | wc -c` -gt 2 ];
@@ -141,7 +141,7 @@ function pre_snapshot {
   local db_port=$OPENSHIFT_MARIADB_DB_PORT
 
   {
-    mysql_context "$OPENSHIFT_MARIADB_DIR/mariadb/bin/mysqldump --extended-insert --quick -h $db_host -P $db_port -u $OPENSHIFT_MARIADB_DB_USERNAME --password='$OPENSHIFT_MARIADB_DB_PASSWORD' --all-databases --events --triggers --routines --add-drop-table" | /bin/gzip > $dump_file
+    mysql_context "$OPENSHIFT_MARIADB_DIR/binaries/mariadb/bin/mysqldump --extended-insert --quick -h $db_host -P $db_port -u $OPENSHIFT_MARIADB_DB_USERNAME --password='$OPENSHIFT_MARIADB_DB_PASSWORD' --all-databases --events --triggers --routines --add-drop-table" | /bin/gzip > $dump_file
   } ||
   {
     warning "Couldn't not dump mariadb! Continuing anyway"
@@ -195,7 +195,7 @@ function post_restore {
         echo "SET UNIQUE_CHECKS=1;"
         echo "SET AUTOCOMMIT=1;"
         echo "COMMIT;"
-      ) | $OPENSHIFT_MARIADB_DIR/mariadb/bin/mysql -h $OPENSHIFT_MARIADB_DB_HOST -P $OPENSHIFT_MARIADB_DB_PORT -u $OPENSHIFT_MARIADB_DB_USERNAME --password='$OPENSHIFT_MARIADB_DB_PASSWORD' --skip-column-names
+      ) | $OPENSHIFT_MARIADB_DIR/binaries/mariadb/bin/mysql -h $OPENSHIFT_MARIADB_DB_HOST -P $OPENSHIFT_MARIADB_DB_PORT -u $OPENSHIFT_MARIADB_DB_USERNAME --password='$OPENSHIFT_MARIADB_DB_PASSWORD' --skip-column-names
     } || error "Could not import MariaDB Database" 187
 
 
@@ -229,8 +229,8 @@ function post_restore {
       # This approach provides relational consistency and will work with tables, views, triggers, etc
       # TODO: This may not work if the user created another database that has references to this database
       {
-	mysql_context "$OPENSHIFT_MARIADB_DIR/mariadb/bin/mysqldump -h $NEW_IP -P $OPENSHIFT_MARIADB_DB_PORT -u $NEW_USER --password='$OPENSHIFT_MARIADB_DB_PASSWORD' $OLD_NAME" | \
-          mysql_context "$OPENSHIFT_MARIADB_DIR/mariadb/bin/mysql -h $NEW_IP -P $OPENSHIFT_MARIADB_DB_PORT -u $NEW_USER --password='$OPENSHIFT_MARIADB_DB_PASSWORD' $NEW_NAME"
+	mysql_context "$OPENSHIFT_MARIADB_DIR/binaries/mariadb/bin/mysqldump -h $NEW_IP -P $OPENSHIFT_MARIADB_DB_PORT -u $NEW_USER --password='$OPENSHIFT_MARIADB_DB_PASSWORD' $OLD_NAME" | \
+          mysql_context "$OPENSHIFT_MARIADB_DIR/binaries/mariadb/bin/mysql -h $NEW_IP -P $OPENSHIFT_MARIADB_DB_PORT -u $NEW_USER --password='$OPENSHIFT_MARIADB_DB_PASSWORD' $NEW_NAME"
       } || error "Could not rename database" 187
 
       # Drop the old database now that the data has been preserved

@@ -8,7 +8,7 @@
 
 [mysqld]
 datadir=<%= ENV['OPENSHIFT_MARIADB_DIR'] %>/data/
-basedir=<%= ENV['OPENSHIFT_MARIADB_DIR'] %>/mariadb/
+basedir=<%= ENV['OPENSHIFT_MARIADB_DIR'] %>/binaries/mariadb/
 socket=<%= ENV['OPENSHIFT_MARIADB_DB_SOCKET'] %>
 bind-address=<%= ENV['OPENSHIFT_MARIADB_DB_HOST'] %>
 # Disabling symbolic-links is recommended to prevent assorted security risks
@@ -61,10 +61,7 @@ interactive-timeout
 # Because of the scaling - we'll let the control script dynamically assign the hosts in the cluster
 # wsrep_cluster_address=gcomm://db01.example.com
 
-# Use the provider we downloaded earlier
-#wsrep_provider=<%= ENV['OPENSHIFT_MARIADB_DIR'] %>/galera/usr/lib64/galera/libgalera_smm.so
-wsrep_provider=none
-
+wsrep_provider=<%= ENV['OPENSHIFT_MARIADB_DIR'] %>/binaries/galera/usr/lib64/galera/libgalera_smm.so
 wsrep_cluster_name=<%= ENV['OPENSHIFT_APP_NAME'] %>
 
 # Define the default port
