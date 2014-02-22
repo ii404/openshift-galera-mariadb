@@ -6,7 +6,7 @@ set -e
 #namespace=$2
 #local_gear=$3
 
-echo -n "Set MariaDB Node: "
+echo -n "Set MariaDB Node: " >> $OPENSHIFT_MARIADB_DIR/hook-log
 echo "$@" >> $OPENSHIFT_MARIADB_DIR/hook-log
 
 # find main node addr
