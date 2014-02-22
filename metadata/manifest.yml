@@ -66,11 +66,11 @@ Publishes:
     Type: ENV:NET_TCP:db:connection-info
 Subscribes:
   set-mariadb-node:
-    Type: ENV:NET_TCP:mariadb-cluster
+    Type: NET_TCP:mariadb-cluster
   set-mariadb-galera-node:
-    Type: ENV:NET_TCP:mariadb-galera
+    Type: NET_TCP:mariadb-galera
   set-mariadb-sst-node:
-    Type: ENV:NET_TCP:mariadb-sst
+    Type: NET_TCP:mariadb-sst
 Scaling:
   Min: 2
   Max: -1
