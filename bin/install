@@ -16,7 +16,7 @@ set_env_var 'OPENSHIFT_MARIADB_VERSION' $version $env_dir
 export OPENSHIFT_MARIADB_VERSION=$version
 
 # Check if this is the first host in cluster
-if [ `wc -l $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_NODE_GEARS` -lt 2 ]
+if [ `wc -l $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_NODE_GEARS | cut -f1 -d" "` -lt 2 ]
 then
 	
 # Generate username, password, and db name and create env variables
