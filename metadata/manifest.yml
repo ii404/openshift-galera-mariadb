@@ -57,11 +57,11 @@ Provides:
 - MariaDB-client
 Publishes:
   publish-mariadb-node:
-    Type: ENV:NET_TCP:mariadb-cluster
+    Type: NET_TCP:mariadb-cluster
   publish-mariadb-galera-node:
-    Type: ENV:NET_TCP:mariadb-galera
+    Type: NET_TCP:mariadb-galera
   publish-mariadb-sst-node:
-    Type: ENV:NET_TCP:mariadb-sst
+    Type: NET_TCP:mariadb-sst
   publish-db-connection-info:
     Type: ENV:NET_TCP:db:connection-info
 Subscribes:
