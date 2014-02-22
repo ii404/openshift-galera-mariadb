@@ -16,8 +16,8 @@ set_env_var 'OPENSHIFT_MARIADB_VERSION' $version $env_dir
 export OPENSHIFT_MARIADB_VERSION=$version
 
 # Check if this is the first host in cluster
-if [ `wc -l $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_NODE_GEARS | cut -f1 -d" "` -lt 2 ]
-then
+#if [ `wc -l $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_NODE_GEARS | cut -f1 -d" "` -lt 2 ]
+#then
 	
 # Generate username, password, and db name and create env variables
 echo 'Generating username and password'
@@ -76,8 +76,8 @@ flush privileges;" | mysql_context "$OPENSHIFT_MARIADB_DIR/binaries/mariadb/bin/
 # Restart MariaDB
 $OPENSHIFT_MARIADB_DIR/bin/control restart
 
-else
-	# Join the cluster
-	$OPENSHIFT_MARIADB_DIR/bin/control start
-
-fi
+#else
+#	# Join the cluster
+#	$OPENSHIFT_MARIADB_DIR/bin/control start
+#
+#fi
