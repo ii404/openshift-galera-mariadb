@@ -38,8 +38,4 @@ mkdir -p $OPENSHIFT_MARIADB_DIR/{log,pid,socket,data,run}
 
 cp $OPENSHIFT_MARIADB_DIR/conf/my.cnf.erb $OPENSHIFT_MARIADB_DIR/conf/my.cnf.erb.hidden
 
-touch $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_NODE_GEARS
-touch $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_SST_GEARS
-touch $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_GALERA_GEARS
-
 update_configuration $version

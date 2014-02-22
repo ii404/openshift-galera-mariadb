@@ -6,6 +6,10 @@ set -e
 #namespace=$2
 #local_gear=$3
 
+if [ ! -f $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_GALERA_GEARS ]; then
+	touch $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_SST_GEARS
+fi
+
 echo -n "Set MariaDB SST Node: " >> $OPENSHIFT_MARIADB_DIR/hook-log
 echo "$@" >> $OPENSHIFT_MARIADB_DIR/hook-log
 
