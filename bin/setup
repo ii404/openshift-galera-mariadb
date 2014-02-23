@@ -8,8 +8,11 @@ case "$1" in
     version="$2"
 esac
 
+# Create our data directories
 mkdir -p $OPENSHIFT_MARIADB_DIR/{log,pid,socket,data,run}
 
-cp $OPENSHIFT_MARIADB_DIR/conf/my.cnf.erb $OPENSHIFT_MARIADB_DIR/conf/my.cnf.erb.hidden
+# Move cnf files
+mv $OPENSHIFT_MARIADB_DIR/conf/my-init.cnf.erb $OPENSHIFT_MARIADB_DIR/conf/my-init.cnf.erb.hidden
+mv $OPENSHIFT_MARIADB_DIR/conf/my-cluster.cnf.erb $OPENSHIFT_MARIADB_DIR/conf/my-cluster.cnf.erb.hidden
 
 update_configuration $version
