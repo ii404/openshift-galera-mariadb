@@ -52,10 +52,6 @@ oo-erb $OPENSHIFT_MARIADB_DIR/conf/my-init.cnf.erb.hidden > $OPENSHIFT_MARIADB_D
 # Initialize the MariaDB databases - basedir is IMPORTANT!
 mysql_context "$OPENSHIFT_MARIADB_DIR/binaries/mariadb/scripts/mysql_install_db --basedir=$OPENSHIFT_MARIADB_DIR/binaries/mariadb/ --datadir=${OPENSHIFT_MARIADB_DIR}/data --user=${USER}" || error 'Failed to create mariadb database', 119
 
-# Starting MariaDB in Standalone Mode
-echo 'Starting MariaDB in standalone mode'
-mysql_context "./bin/mysqld_safe --defaults-file=$OPENSHIFT_MARIADB_DIR/conf/my.cnf" > /dev/null 2>&1 &
-
 # Clean Up
 echo "drop database test;
 create database \`${dbname}\` DEFAULT CHARACTER SET utf8 DEFAULT COLLATE utf8_general_ci;" | mysql_context "$OPENSHIFT_MARIADB_DIR/binaries/mariadb/bin/mysql -u root -S '$OPENSHIFT_MARIADB_DB_SOCKET'" > /dev/null || error 'Failed to create database' 188
