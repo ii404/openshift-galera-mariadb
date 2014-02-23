@@ -30,8 +30,6 @@ function is_running {
 # TODO: source user hooks?
 # Start mysqld and block until it comes up.
 function start {
-error 'We ran start'
-
   if ! is_running; then
     echo "Starting MariaDB cartridge"
     oo-erb $OPENSHIFT_MARIADB_DIR/conf/my-cluster.cnf.erb.hidden > $OPENSHIFT_MARIADB_DIR/conf/my.cnf

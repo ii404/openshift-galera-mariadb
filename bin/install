@@ -47,14 +47,13 @@ echo "mysql://$username:$password@$OPENSHIFT_MARIADB_DB_HOST:$OPENSHIFT_MARIADB_
 echo 'Bootstrap MariaDB'
 
 # Setup the my-cnf Files
-oo-erb $OPENSHIFT_MARIADB_DIR/conf/my-init.cnf.erb.hidden > $OPENSHIFT_MARIADB_DIR/conf/my.cnf
+oo-erb $OPENSHIFT_MARIADB_DIR/conf/my-cluster.cnf.erb.hidden > $OPENSHIFT_MARIADB_DIR/conf/my.cnf
 
 # Initialize the MariaDB databases - basedir is IMPORTANT!
 mysql_context "$OPENSHIFT_MARIADB_DIR/binaries/mariadb/scripts/mysql_install_db --defaults-file=$OPENSHIFT_MARIADB_DIR/conf/my.cnf --basedir=$OPENSHIFT_MARIADB_DIR/binaries/mariadb/ --datadir=${OPENSHIFT_MARIADB_DIR}/data --user=${USER}" || error 'Failed to create mariadb database', 119
 
-# Starting MariaDB in Standalone Mode
-echo 'Starting MariaDB in standalone mode'
-mysql_context "./bin/mysqld_safe --defaults-file=$OPENSHIFT_MARIADB_DIR/conf/my.cnf" > /dev/null 2>&1 &
+# Starting MariaDB Initial Host
+mysql_context "./bin/mysqld_safe --defaults-file=$OPENSHIFT_MARIADB_DIR/conf/my.cnf --wsrep_node_address="$OPENSHIFT_GEAR_DNS" --wsrep_node_incoming_address="$OPENSHIFT_GEAR_DNS" --wsrep_cluster_address='gcomm://' " > /dev/null 2>&1 &
 
 # Clean Up
 echo "drop database test;
@@ -66,18 +65,6 @@ delete from user;
 grant all on *.* to '$username'@'%' identified by '$password' with grant option;
 flush privileges;" | mysql_context "$OPENSHIFT_MARIADB_DIR/binaries/mariadb/bin/mysql -u root -S '$OPENSHIFT_MARIADB_DB_SOCKET' mysql" > /dev/null || error "Failed to setup initial root user" 187
 
-# Give it some time to settle in
-sleep 5
-
-# Bring down MariaDB
-echo 'Shutting down MariaDB to prepare for galera gluster'
-$OPENSHIFT_MARIADB_DIR/bin/control stop
-
-# Setup the new my-cnf Files
-oo-erb $OPENSHIFT_MARIADB_DIR/conf/my-cluster.cnf.erb.hidden > $OPENSHIFT_MARIADB_DIR/conf/my.cnf
-
-## Now Start the new_cluster
-mysql_context "./bin/mysqld_safe --defaults-file=$OPENSHIFT_MARIADB_DIR/conf/my.cnf --wsrep_node_address="$OPENSHIFT_GEAR_DNS" --wsrep_node_incoming_address="$OPENSHIFT_GEAR_DNS" --wsrep_new_cluster --wsrep_cluster_address='gcomm://' " > /dev/null 2>&1 &
 
 client_result ""
 client_result "MariaDB Galera Cluster ${OPENSHIFT_MARIADB_VERSION} database added.  Please make note of these credentials:"
