@@ -55,9 +55,6 @@ mysql_context "$OPENSHIFT_MARIADB_DIR/binaries/mariadb/scripts/mysql_install_db 
 # We MUST run mysqld_safe from this dir or else it will fail
 cd $OPENSHIFT_MARIADB_DIR/binaries/mariadb
 
-# Starting MariaDB Initial Host
-mysql_context "./bin/mysqld_safe --defaults-file=$OPENSHIFT_MARIADB_DIR/conf/my.cnf --wsrep_cluster_address='gcomm://'" > /dev/null 2>&1 &
-
 # Clean Up
 echo "drop database test;
 create database '$OPENSHIFT_APP_NAME' DEFAULT CHARACTER SET utf8 DEFAULT COLLATE utf8_general_ci;" | mysql_context "$OPENSHIFT_MARIADB_DIR/binaries/mariadb/bin/mysql -u root -S '$OPENSHIFT_MARIADB_DB_SOCKET'" > /dev/null || error 'Failed to create database' 188
