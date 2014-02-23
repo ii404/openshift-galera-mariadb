@@ -58,3 +58,20 @@ sort_buffer_size = 8M
 interactive-timeout
 
 
+[mariadb]
+# Because of the scaling - we'll let the control script dynamically assign the hosts in the cluster
+# wsrep_cluster_address=gcomm://db01.example.com
+
+wsrep_provider=<%= ENV['OPENSHIFT_MARIADB_DIR'] %>/binaries/galera/usr/lib64/galera/libgalera_smm.so
+wsrep_cluster_name=<%= ENV['OPENSHIFT_APP_NAME'] %>
+
+# Define the default port
+wsrep_node_address=<%= ENV['OPENSHIFT_GEAR_DNS'] %>:<%= ENV['OPENSHIFT_MARIADB_GALERA_PORT_1'] %>
+
+# I've never used this sst_receive_address before so not sure if this'll work
+wsrep_sst_receive_address=<%= ENV['OPENSHIFT_GEAR_DNS'] %>:<%= ENV['OPENSHIFT_MARIADB_GALERA_PORT_2'] %>
+
+wsrep_sst_method=rsync
+wsrep_sst_auth=<%= ENV['OPENSHIFT_MARIADB_DB_USERNAME'] %>:<%= ENV['OPENSHIFT_MARIADB_DB_PASSWORD'] %>
+log-error=<%= ENV['OPENSHIFT_MARIADB_DB_LOG_DIR'] %>/galera_cluster.log
+
