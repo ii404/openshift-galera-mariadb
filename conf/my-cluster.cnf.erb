@@ -59,7 +59,8 @@ interactive-timeout
 
 
 [mariadb]
-wsrep_provider=<%= ENV['OPENSHIFT_MARIADB_DIR'] %>/binaries/galera/usr/lib64/galera/libgalera_smm.so
+wsrep_provider=none
+#wsrep_provider=<%= ENV['OPENSHIFT_MARIADB_DIR'] %>/binaries/galera/usr/lib64/galera/libgalera_smm.so
 wsrep_cluster_name=<%= ENV['OPENSHIFT_APP_NAME'] %>
 
 # Define the default port
