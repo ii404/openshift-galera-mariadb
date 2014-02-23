@@ -53,14 +53,18 @@ oo-erb $OPENSHIFT_MARIADB_DIR/conf/my-cluster.cnf.erb.hidden > $OPENSHIFT_MARIAD
 mysql_context "$OPENSHIFT_MARIADB_DIR/binaries/mariadb/scripts/mysql_install_db --defaults-file=$OPENSHIFT_MARIADB_DIR/conf/my.cnf --basedir=$OPENSHIFT_MARIADB_DIR/binaries/mariadb/ --datadir=$OPENSHIFT_MARIADB_DIR/data --user=$USER" || error 'Failed to create mariadb database', 119
 
 # Restart the MariaDB into the Galera Cluster
-# We will let the control script auto determine the galera status
-$OPENSHIFT_MARIADB_DIR/bin/control restart
+$OPENSHIFT_MARIADB_DIR/bin/control stop
 
-# Clean Up
+# We can't let the control script auto determine the galera status because hooks haven't been executed yet
+# We MUST run mysqld_safe from this dir or else it will fail
+cd $OPENSHIFT_MARIADB_DIR/binaries/mariadb
+mysql_context "./bin/mysqld_safe --defaults-file=$OPENSHIFT_MARIADB_DIR/conf/my.cnf --wsrep_cluster_address='gcomm://'" > /dev/null 2>&1 &
+
+# Drop the test database and create our application's database
 echo "drop database test;
 create database '$OPENSHIFT_APP_NAME' DEFAULT CHARACTER SET utf8 DEFAULT COLLATE utf8_general_ci;" | mysql_context "$OPENSHIFT_MARIADB_DIR/binaries/mariadb/bin/mysql -u root -S '$OPENSHIFT_MARIADB_DB_SOCKET'" > /dev/null || error 'Failed to create database' 188
 
-# Create New User
+# Delete the test user and create our admin user from the generated_username and generated_password
 echo "                                  
 delete from user;
 grant all on *.* to '$username'@'%' identified by '$password' with grant option;
