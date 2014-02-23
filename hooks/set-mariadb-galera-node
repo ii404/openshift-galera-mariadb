@@ -6,10 +6,6 @@ set -e
 #namespace=$2
 #local_gear=$3
 
-if [ ! -f $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_GALERA_GEARS ]; then
-	touch $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_GALERA_GEARS
-fi
-
 # echo "$@" >> $OPENSHIFT_MARIADB_DIR/hook-log
 
 echo ${@:4};
