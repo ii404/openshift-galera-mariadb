@@ -53,7 +53,7 @@ oo-erb $OPENSHIFT_MARIADB_DIR/conf/my-cluster.cnf.erb.hidden > $OPENSHIFT_MARIAD
 mysql_context "$OPENSHIFT_MARIADB_DIR/binaries/mariadb/scripts/mysql_install_db --defaults-file=$OPENSHIFT_MARIADB_DIR/conf/my.cnf --basedir=$OPENSHIFT_MARIADB_DIR/binaries/mariadb/ --datadir=$OPENSHIFT_MARIADB_DIR/data --user=$USER" || error 'Failed to create mariadb database', 119
 
 # Starting MariaDB Initial Host
-mysql_context "./bin/mysqld_safe --defaults-file=$OPENSHIFT_MARIADB_DIR/conf/my.cnf --wsrep_node_address="$OPENSHIFT_GEAR_DNS" --wsrep_node_incoming_address="$OPENSHIFT_GEAR_DNS" --wsrep_cluster_address='gcomm://' " > /dev/null 2>&1 &
+mysql_context "./bin/mysqld_safe --defaults-file=$OPENSHIFT_MARIADB_DIR/conf/my.cnf --wsrep_cluster_address='gcomm://'" > /dev/null 2>&1 &
 
 # Clean Up
 echo "drop database test;
