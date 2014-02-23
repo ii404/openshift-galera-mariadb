@@ -13,6 +13,6 @@ rm -rf $OPENSHIFT_MARIADB_DIR/binaries/mariadb/man
 
 # Lets grab galera
 cd $OPENSHIFT_MARIADB_DIR/galera
-wget https://launchpad.net/galera/2.x/25.2.8/+download/galera-25.2.8-1.rhel6.x86_64.rpm
-rpm2cpio galera-25.2.8-1.rhel6.x86_64.rpm | cpio -idmv
+wget https://launchpad.net/galera/2.x/23.2.7/+download/galera-23.2.7-1.rhel6.x86_64.rpm
+rpm2cpio galera-23.2.7-1.rhel6.x86_64.rpm | cpio -idmv
 
