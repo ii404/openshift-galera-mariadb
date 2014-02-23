@@ -52,8 +52,9 @@ oo-erb $OPENSHIFT_MARIADB_DIR/conf/my-cluster.cnf.erb.hidden > $OPENSHIFT_MARIAD
 # Initialize the MariaDB databases - basedir is IMPORTANT!
 mysql_context "$OPENSHIFT_MARIADB_DIR/binaries/mariadb/scripts/mysql_install_db --defaults-file=$OPENSHIFT_MARIADB_DIR/conf/my.cnf --basedir=$OPENSHIFT_MARIADB_DIR/binaries/mariadb/ --datadir=$OPENSHIFT_MARIADB_DIR/data --user=$USER" || error 'Failed to create mariadb database', 119
 
-# We MUST run mysqld_safe from this dir or else it will fail
-cd $OPENSHIFT_MARIADB_DIR/binaries/mariadb
+# Restart the MariaDB into the Galera Cluster
+# We will let the control script auto determine the galera status
+$OPENSHIFT_MARIADB_DIR/bin/control restart
 
 # Clean Up
 echo "drop database test;
