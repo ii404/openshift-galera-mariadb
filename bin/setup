@@ -12,8 +12,7 @@ esac
 mkdir -p $OPENSHIFT_MARIADB_DIR/{log,pid,socket,data,run}
 
 # Move cnf files
-mv $OPENSHIFT_MARIADB_DIR/conf/my-init.cnf.erb $OPENSHIFT_MARIADB_DIR/conf/my-init.cnf.erb.hidden
-mv $OPENSHIFT_MARIADB_DIR/conf/my-cluster.cnf.erb $OPENSHIFT_MARIADB_DIR/conf/my-cluster.cnf.erb.hidden
+mv $OPENSHIFT_MARIADB_DIR/conf/my.cnf.erb $OPENSHIFT_MARIADB_DIR/conf/my.cnf.erb.hidden
 
 # Touch our variables so they are owned by our user
 touch $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_SST_GEARS
