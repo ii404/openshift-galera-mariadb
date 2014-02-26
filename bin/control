@@ -116,6 +116,10 @@ curl -X POST -d "control=$OPENSHIFT_GEAR_DNS - has finished db-init" http://requ
 # TODO: source user hooks?
 # Start mysqld and block until it comes up.
 function start {
+
+# Hooks should be doing all the checks, but we'll do one last test.
+if fgrep -q "1" $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_INIT_DB
+then
   if ! is_running; then
     echo "Starting MariaDB cartridge"
     curl -X POST -d "control=$OPENSHIFT_GEAR_DNS - starting mariadb" http://requestb.in/1k9zri41
@@ -159,6 +163,9 @@ function start {
   else
     echo "MariaDB already running" 1>&2
   fi
+else
+  echo "db-init hasn't been executed yet!"
+fi
 }
 
 function wait_for_mysqld_availability {
