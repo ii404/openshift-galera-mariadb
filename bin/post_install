@@ -3,4 +3,4 @@
 source $OPENSHIFT_CARTRIDGE_SDK_BASH
 source "${OPENSHIFT_MARIADB_DIR}/lib/mysql_context"
 
-curl -X POST -d "post_install=$OPENSHIFT_GEAR_DNS - has finished post_install" http://requestb.in/1k9zri41
+echo "post_install=$OPENSHIFT_GEAR_DNS - has finished post_install" 
