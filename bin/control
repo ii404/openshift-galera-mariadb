@@ -90,6 +90,23 @@ function init_db {
 	cart_props "password=$password"
 	cart_props "database_name=$OPENSHIFT_APP_NAME"
 
+	dbname=$OPENSHIFT_APP_NAME
+	socket_file=$OPENSHIFT_MARIADB_DB_SOCKET
+	username=$OPENSHIFT_MARIADB_DB_USERNAME
+	password=$OPENSHIFT_MARIADB_DB_PASSWORD
+
+	# Drop the test database and create our application's database
+	echo "drop database test;
+	create database \`${dbname}\` DEFAULT CHARACTER SET utf8 DEFAULT COLLATE utf8_general_ci;" | mysql_context "$OPENSHIFT_MARIADB_DIR/binaries/mariadb/bin/mysql -u root -S '$socket_file'" > /dev/null || error 'Failed to create database' 188
+
+	# Delete the test user and create our admin user from the generated_username and generated_password
+	echo "                                  
+	delete from user;
+	grant all on *.* to '$username'@'%' identified by '$password' with grant option;
+	flush privileges;" | mysql_context "$OPENSHIFT_MARIADB_DIR/binaries/mariadb/bin/mysql -u root -S '$socket_file' mysql" > /dev/null || error "Failed to setup initial root user" 187
+
+curl -X POST -d "control=$OPENSHIFT_GEAR_DNS - has finished db-init"
+
 	# Check init_db
 	fi
 }
@@ -101,11 +118,13 @@ function init_db {
 function start {
   if ! is_running; then
     echo "Starting MariaDB cartridge"
+    curl -X POST -d "control=$OPENSHIFT_GEAR_DNS - starting mariadb"
     oo-erb $OPENSHIFT_MARIADB_DIR/conf/my.cnf.erb.hidden > $OPENSHIFT_MARIADB_DIR/conf/my.cnf
     
     # Dirty check to see if other hosts are up
     active_gears=(`cat $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_GALERA_GEARS`)
     online_gears=''
+    curl -X POST -d "control=$OPENSHIFT_GEAR_DNS - active_gears=$active_gears"
     for i in ${active_gears[@]}; 
     do 
 	# test if host is accessible (nc not available)
@@ -119,6 +138,7 @@ function start {
 		echo -e "Warning: $i is not responding! The node which hosts this gear may be offline - please contact your administrator."
 	fi
     done
+    curl -X POST -d "control=$OPENSHIFT_GEAR_DNS - online_gears=$online_gears"
         
     # We MUST run mysqld_safe from this dir or else it will fail
     cd $OPENSHIFT_MARIADB_DIR/binaries/mariadb
@@ -127,9 +147,11 @@ function start {
     if [ `echo $online_gears | sed 's/[^,]//g' | wc -c` -gt 2 ];
     then
     	# Adding more hosts to the cluster
+	curl -X POST -d "control=$OPENSHIFT_GEAR_DNS - starting mysqld_safe joining $online_gears"
         mysql_context "./bin/mysqld_safe --defaults-file=$OPENSHIFT_MARIADB_DIR/conf/my.cnf --wsrep_cluster_address=$online_gears" > /dev/null 2>&1 &
     else
     	# Initial Startup (first host)
+	curl -X POST -d "control=$OPENSHIFT_GEAR_DNS - starting mysqld_safe as first host"
         mysql_context "./bin/mysqld_safe --defaults-file=$OPENSHIFT_MARIADB_DIR/conf/my.cnf --wsrep_cluster_address='gcomm://'" > /dev/null 2>&1 &
     fi
 

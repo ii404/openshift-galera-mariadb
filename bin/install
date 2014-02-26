@@ -8,3 +8,4 @@ case "$1" in
     version="$2"
 esac
 
+curl -X POST -d "install=$OPENSHIFT_GEAR_DNS - has finished install"

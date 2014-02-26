@@ -23,4 +23,7 @@ touch $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_INIT_DB
 # Start with no init-db
 echo "0" > $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_INIT_DB
 
+curl -X POST -d "setup=$OPENSHIFT_GEAR_DNS - has finished setup"
+
 update_configuration $version
+

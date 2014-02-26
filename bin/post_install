@@ -3,27 +3,4 @@
 source $OPENSHIFT_CARTRIDGE_SDK_BASH
 source "${OPENSHIFT_MARIADB_DIR}/lib/mysql_context"
 
-dbname=$OPENSHIFT_APP_NAME
-socket_file=$OPENSHIFT_MARIADB_DB_SOCKET
-username=$OPENSHIFT_MARIADB_DB_USERNAME
-password=$OPENSHIFT_MARIADB_DB_PASSWORD
-
-# Restart the MariaDB into the Galera Cluster
-# $OPENSHIFT_MARIADB_DIR/bin/control stop
-
-# We can't let the control script auto determine the galera status because hooks haven't been executed yet
-# We MUST run mysqld_safe from this dir or else it will fail
-# cd $OPENSHIFT_MARIADB_DIR/binaries/mariadb
-# mysql_context "./bin/mysqld_safe --defaults-file=$OPENSHIFT_MARIADB_DIR/conf/my.cnf --wsrep_cluster_address='gcomm://'" > /dev/null 2>&1 &
-
-# Drop the test database and create our application's database
-echo "drop database test;
-create database \`${dbname}\` DEFAULT CHARACTER SET utf8 DEFAULT COLLATE utf8_general_ci;" | mysql_context "$OPENSHIFT_MARIADB_DIR/binaries/mariadb/bin/mysql -u root -S '$socket_file'" > /dev/null || error 'Failed to create database' 188
-
-# Delete the test user and create our admin user from the generated_username and generated_password
-echo "                                  
-delete from user;
-grant all on *.* to '$username'@'%' identified by '$password' with grant option;
-flush privileges;" | mysql_context "$OPENSHIFT_MARIADB_DIR/binaries/mariadb/bin/mysql -u root -S '$socket_file' mysql" > /dev/null || error "Failed to setup initial root user" 187
-
-
+curl -X POST -d "post_install=$OPENSHIFT_GEAR_DNS - has finished post_install"
