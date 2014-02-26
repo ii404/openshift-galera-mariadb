@@ -174,10 +174,10 @@ then
 				echo "quit" | telnet $(echo $master_gear | tr ":" "\n") | grep Connected > /dev/null 2>&1
 					if [ "$?" -ne "1" ]; #Ok
 					then
-						$OPENSHIFT_MARIADB_DIR/bin/control start
 						# We're done!
 						curl -X POST -d echo "hooks=$OPENSHIFT_GEAR_DNS -  host $OPENSHIFT_GEAR_DNS joined the cluster" http://requestb.in/t67sxlt6
 						echo "1" > $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_INIT_DB
+						$OPENSHIFT_MARIADB_DIR/bin/control start
 						break
 					fi
 			done
