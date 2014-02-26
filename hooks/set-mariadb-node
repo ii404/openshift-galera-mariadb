@@ -8,6 +8,24 @@ set -e
 
 # echo "$@" >> $OPENSHIFT_MARIADB_DIR/hook-log
 
+# Touch our variables so they are owned by our user
+if [ ! -f $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_NODE_GEARS ]; then
+	touch $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_NODE_GEARS
+fi
+
+if [ ! -f $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_GALERA_GEARS ]; then
+	touch $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_GALERA_GEARS
+fi
+
+if [ ! -f $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_SST_GEARS ]; then
+	touch $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_SST_GEARS
+fi
+
+if [ ! -f $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_INIT_GEARS ]; then
+	touch $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_INIT_GEARS
+	echo 0 > $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_INIT_GEARS
+fi
+
 echo ${@:4};
 for arg in ${@:4}; do
 	arg=$(echo "$arg" | tr -d "\n" | tr -d "'")
@@ -55,7 +73,7 @@ for arg in ${@:4}; do
 	else
 		# Append to array of gears
 		node_gears=("${node_gears[@]}" "${node}")
-		curl -X POST -d "hooks=$OPENSHIFT_GEAR_DNS -  set $node_gears" http://requestb.in/1k9zri41
+		curl -X POST -d "hooks=$OPENSHIFT_GEAR_DNS -  set node_gears=$node_gears" http://requestb.in/1k9zri41
 	fi
 
 	# Save our results
@@ -85,6 +103,7 @@ for arg in ${@:4}; do
 	else
 		# Append to array of gears
 		galera_gears=("${galera_gears[@]}" "${galera}")
+		curl -X POST -d "hooks=$OPENSHIFT_GEAR_DNS -  set galera_gears=$galear_gears" http://requestb.in/1k9zri41
 	fi
 
 	# Save our results
@@ -113,6 +132,7 @@ for arg in ${@:4}; do
 	else
 		# Append to array of gears
 		sst_gears=("${sst_gears[@]}" "${sst}")
+		curl -X POST -d "hooks=$OPENSHIFT_GEAR_DNS -  set sst_gears=$sst_gears" http://requestb.in/1k9zri41
 	fi
 
 	# Save our results
