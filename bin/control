@@ -158,7 +158,7 @@ then
         ./bin/mysqld_safe --defaults-file=$OPENSHIFT_MARIADB_DIR/conf/my.cnf --wsrep_cluster_address='gcomm://' > /dev/null 2>&1 &
     else
     	echo 'Adding more hosts to the cluster'
-        ./bin/mysqld_safe --defaults-file=$OPENSHIFT_MARIADB_DIR/conf/my.cnf --wsrep_cluster_address=$online_gears > /dev/null 2>&1 &
+        ./bin/mysqld_safe --defaults-file=$OPENSHIFT_MARIADB_DIR/conf/my.cnf --wsrep_cluster_address="gcomm://$online_gears" > /dev/null 2>&1 &
     fi
 
     wait_for_mysqld_availability
