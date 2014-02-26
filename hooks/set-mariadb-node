@@ -2,6 +2,9 @@
 
 set -e
 
+# Manual Test
+# sh hooks/set-mariadb-node publish-mariadb mariadb andrewklau 123-andrewklau.getup.io:50216:50217:50218
+
 #app_name=$1
 #namespace=$2
 #local_gear=$3
@@ -21,9 +24,9 @@ if [ ! -f $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_SST_GEARS ]; then
 	touch $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_SST_GEARS
 fi
 
-if [ ! -f $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_INIT_GEARS ]; then
-	touch $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_INIT_GEARS
-	echo 0 > $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_INIT_GEARS
+if [ ! -f $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_INIT_DB ]; then
+	touch $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_INIT_DB
+	echo 0 > $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_INIT_DB
 fi
 
 echo ${@:4};
@@ -60,24 +63,15 @@ for arg in ${@:4}; do
 	if fgrep -q "${node}" $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_NODE_GEARS
 	then
 		# Remove the address from the array
-		i=0
-		for n in ${node_gears[@]}; do
-			if [ "$n" = "$node" ]
-			then
-				echo "hooks=$OPENSHIFT_GEAR_DNS -  unset {$node_gears[$i]}" 
-				unset node_gears[$i]
-				break
-			fi
-			let i++
-		done
+		node_gears=( "${node_gears[@]/$node}" )
 	else
 		# Append to array of gears
-		node_gears=("${node_gears[@]}" "${node}")
+		node_gears+=($node)
 		echo "hooks=$OPENSHIFT_GEAR_DNS -  set node_gears=$node_gears" 
 	fi
 
 	# Save our results
-	echo $node_gears > $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_NODE_GEARS
+	echo ${node_gears[@]} > $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_NODE_GEARS
 
 	## 
 	# Galera End Points
@@ -90,24 +84,16 @@ for arg in ${@:4}; do
 	if fgrep -q "${galera}" $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_GALERA_GEARS
 	then
 		# Remove the address from the array
-		i=0
-		for g in ${galera_gears[@]}; do
-			if [ "$g" = "$galera" ]
-			then
-				unset galera_gears[$i]
-				break
-			fi
-			let i++
-		done
+		galera_gears=( "${galera_gears[@]/$galera}" )
 
 	else
 		# Append to array of gears
-		galera_gears=("${galera_gears[@]}" "${galera}")
-		echo "hooks=$OPENSHIFT_GEAR_DNS -  set galera_gears=$galear_gears" 
+		galera_gears+=($galera)
+		echo "hooks=$OPENSHIFT_GEAR_DNS -  set galera_gears=$galera_gears" 
 	fi
 
 	# Save our results
-	echo $galera_gears > $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_GALERA_GEARS
+	echo ${galera_gears[@]} > $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_GALERA_GEARS
 
 	## 
 	# SST End Points
@@ -120,23 +106,15 @@ for arg in ${@:4}; do
 	if fgrep -q "${sst}" $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_SST_GEARS
 	then
 		# Remove the address from the array
-		i=0
-		for s in ${sst_gears[@]}; do
-			if [ "$s" = "$sst" ]
-			then
-				unset sst_gears[$i]
-				break
-			fi
-			let i++
-		done
+		sst_gears=( "${sst_gears[@]/$sst}" )
 	else
 		# Append to array of gears
-		sst_gears=("${sst_gears[@]}" "${sst}")
+		sst_gears+=($sst)
 		echo "hooks=$OPENSHIFT_GEAR_DNS -  set sst_gears=$sst_gears" 
 	fi
 
 	# Save our results
-	echo $sst_gears > $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_SST_GEARS
+	echo ${sst_gears[@]} > $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_SST_GEARS
 done
 
 ##
@@ -148,17 +126,17 @@ if fgrep -q "0" $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_INIT_DB
 then
 	# Check if the database has been initialized
 	total_hosts=( `cat $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_NODE_GEARS` )
-	echo "hooks=$OPENSHIFT_GEAR_DNS -  total hosts are $total_hosts" 
+	echo "hooks=$OPENSHIFT_GEAR_DNS -  total hosts are $total_hosts[@]" 
 
 	# Check if it meets the minimum 3 requirement (only 3)
 	if [ ${#total_hosts[@]} == 3 ]
-	echo "hooks=$OPENSHIFT_GEAR_DNS -  entering min 3 mode" 
 	then
+	echo "hooks=$OPENSHIFT_GEAR_DNS -  entering min 3 mode" 
 
 		# Set master_gear to an excedingly high value
 		master_gear=9999999999999999999999999999999zzzzzzzzzzzzzzzzzzzzzzz
 		# Determine lowest UUID with simple comparrision
-		for t in "${#total_hosts[@]}"
+		for t in "${total_hosts[@]}"
 		do 
 			if [ $t \< $master_gear ]
 			then
@@ -167,7 +145,7 @@ then
 		done
 		echo "hooks=$OPENSHIFT_GEAR_DNS -  our master_gear is $master_gear" 
 
-		if [ $OPENSHIFT_GEAR_UUID == $master_gear ]
+		if [ "$OPENSHIFT_GEAR_DNS:$OPENSHIFT_MARIADB_NODE_GALERA_PORT_1" == $master_gear ]
 		then
 			echo "hooks=$OPENSHIFT_GEAR_DNS -  starting the init-db function" 
 			$OPENSHIFT_MARIADB_DIR/bin/control init-db
