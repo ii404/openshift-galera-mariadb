@@ -63,6 +63,7 @@ for arg in ${@:4}; do
 	then
 		# Remove the address from the array
 #		node_gears=( "${node_gears[@]/$node}" )
+		echo 'Doing nothing...'
 	else
 		# Append to array of gears
 		node_gears+=($node)
@@ -84,6 +85,7 @@ for arg in ${@:4}; do
 	then
 		# Remove the address from the array
 #		galera_gears=( "${galera_gears[@]/$galera}" )
+		echo 'Doing nothing...'
 
 	else
 		# Append to array of gears
@@ -106,6 +108,7 @@ for arg in ${@:4}; do
 	then
 		# Remove the address from the array
 #		sst_gears=( "${sst_gears[@]/$sst}" )
+		echo 'Doing nothing...'
 	else
 		# Append to array of gears
 		sst_gears+=($sst)
