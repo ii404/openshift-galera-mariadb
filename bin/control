@@ -4,6 +4,11 @@ source $OPENSHIFT_CARTRIDGE_SDK_BASH
 
 export STOPTIMEOUT=10
 
+# Setup HOSTALIASES
+echo "$OPENSHIFT_GEAR_DNS $OPENSHIFT_MARIADB_DB_HOST" > $OPENSHIFT_MARIADB_DIR/.hosts
+export HOSTALIASES=$OPENSHIFT_MARIADB_DIR/.hosts
+
+
 # Run mariadb commands
 function run_sql {
   echo "$@" | $OPENSHIFT_MARIADB_DIR/binaries/mariadb/bin/mysql --basedir=$OPENSHIFT_MARIADB_DIR/binaries/mariadb/ -h $OPENSHIFT_MARIADB_DB_HOST -P $OPENSHIFT_MARIADB_DB_PORT -u $OPENSHIFT_MARIADB_DB_USERNAME --password='$OPENSHIFT_MARIADB_DB_PASSWORD' --skip-column-names
@@ -95,15 +100,16 @@ function init_db {
 
 	# Drop the test database and create our application's database
 	echo "drop database test;
-	create database \`${dbname}\` DEFAULT CHARACTER SET utf8 DEFAULT COLLATE utf8_general_ci;" | ./bin/mysql -u root -S '$socket_file' > /dev/null || error 'Failed to create database' 188
+	create database \`${dbname}\` DEFAULT CHARACTER SET utf8 DEFAULT COLLATE utf8_general_ci;" | ./bin/mysql -u root -S ${socket_file} > /dev/null || error 'Failed to create database' 188
 
 	# Delete the test user and create our admin user from the generated_username and generated_password
 	echo "                                  
 	delete from user;
 	grant all on *.* to '$username'@'%' identified by '$password' with grant option;
-	flush privileges;" | ./bin/mysql -u root -S '$socket_file' mysql > /dev/null || error "Failed to setup initial root user" 187
+	flush privileges;" | ./bin/mysql -u root -S ${socket_file} mysql > /dev/null || error "Failed to setup initial root user" 187
 
-echo "control=$OPENSHIFT_GEAR_DNS - has finished db-init" 
+	# DB-INIT Complete
+	echo "1" > $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_INIT_DB
 
 	# Check init_db
 	fi

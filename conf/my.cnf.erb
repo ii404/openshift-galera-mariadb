@@ -60,7 +60,7 @@ interactive-timeout
 
 
 [mariadb]
-#wsrep_provider=none
+# http://www.codership.com/wiki/doku.php?id=mysql_options
 wsrep_provider=<%= ENV['OPENSHIFT_MARIADB_DIR'] %>/binaries/galera/usr/lib64/galera/libgalera_smm.so
 
 # Don't use, causes issues
@@ -70,14 +70,13 @@ wsrep_node_name=<%= ENV['OPENSHIFT_GEAR_DNS'] %>
 
 # Selinux won't let us bind to 0.0.0.0, so specify the loopback address
 wsrep_provider_options=gmcast.listen_addr=tcp://<%= ENV['OPENSHIFT_MARIADB_DB_HOST'] %>:<%= ENV['OPENSHIFT_MARIADB_GALERA_PORT_1'] %>
+#wsrep_provider_options="ist.recv_addr=<ec2_private_ipv4>" 
 
 # Define the default port (to listen on)
-wsrep_node_address=<%= ENV['OPENSHIFT_GEAR_DNS'] %>:<%= ENV['OPENSHIFT_MARIADB_GALERA_PORT_1'] %>
+wsrep_node_address=<%= ENV['OPENSHIFT_GEAR_DNS'] %>:<%= ENV['OPENSHIFT_MARIADB_NODE_GALERA_PORT_1'] %>
 # Define the SST port to RECEIVE on
 wsrep_sst_receive_address=<%= ENV['OPENSHIFT_GEAR_DNS'] %>:<%= ENV['OPENSHIFT_MARIADB_NODE_GALERA_PORT_2'] %>
 
 wsrep_sst_method=rsync
-#wsrep_sst_auth=<%= ENV['OPENSHIFT_MARIADB_DB_USERNAME'] %>:<%= ENV['OPENSHIFT_MARIADB_DB_PASSWORD'] %>
-wsrep_sst_auth=supersecretusername:thisissomedamnsecretpassword
 log-error=<%= ENV['OPENSHIFT_MARIADB_DB_LOG_DIR'] %>/galera_cluster.log
 

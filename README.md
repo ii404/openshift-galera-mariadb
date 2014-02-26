@@ -15,6 +15,7 @@ This should actually be very easy, assuming the node has access to the correct p
 - Modification to the start command, it first will do a quick check to find all the hosts which are online and dynamically update the wsrep_cluster_addresses on boot
 
 **To Do:**
+- Verify logic to prevent racing on cluster resume
 - Move binaries into versions to follow other cartridge hiearchy
 - Use the ssh private to do inter gear routing tests. Lets avoid relying on telnet!
 - Make sure the ENV variables are properly sharing the variables
