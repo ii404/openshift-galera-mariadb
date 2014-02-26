@@ -38,6 +38,7 @@ for arg in ${@:4}; do
 	node_gears=( `cat $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_NODE_GEARS` )
 
 	# check if exists
+	echo 'HOOKS: check galera node..'
 	if fgrep -q "${node}" $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_NODE_GEARS
 	then
 		# Remove the address from the array
@@ -45,6 +46,7 @@ for arg in ${@:4}; do
 		for n in ${node_gears[@]}; do
 			if [ "$n" = "$node" ]
 			then
+				echo "HOOKS: unset {$node_gears[$i]}"
 				unset node_gears[$i]
 				break
 			fi
@@ -53,6 +55,7 @@ for arg in ${@:4}; do
 	else
 		# Append to array of gears
 		node_gears=("${node_gears[@]}" "${node}")
+		echo "HOOKS: set $node_gears"
 	fi
 
 	# Save our results
@@ -125,9 +128,11 @@ if fgrep -q "0" $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_INIT_DB
 then
 	# Check if the database has been initialized
 	total_hosts=( `cat $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_NODE_GEARS` )
+	echo "HOOKS: total hosts are $total_hosts"
 
 	# Check if it meets the minimum 3 requirement (only 3)
 	if [ ${#total_hosts[@]} == 3 ]
+	echo "HOOKS: entering min 3 mode"
 	then
 
 		# Set master_gear to an excedingly high value
@@ -140,11 +145,14 @@ then
 			    	master_gear=$t
 			fi
 		done
+		echo "HOOKS: our master_gear is $master_gear"
 
 		if [ $OPENSHIFT_GEAR_UUID == $master_gear ]
 		then
+			echo "HOOKS: starting the init-db function"
 			$OPENSHIFT_MARIADB_DIR/bin/control init-db
 			echo "1" > $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_INIT_DB
+			echo "HOOKS: calling the restart function for the master_gear"
 			# Start Cluster
 			$OPENSHIFT_MARIADB_DIR/bin/control restart
 
@@ -160,15 +168,20 @@ then
 
 			master_gear="${master_gear_array[0]}:${master_gear_array[1]}"
 
+			test=$(echo $master_gear | tr ":" "\n")
+			echo "HOOKS: we are now running telnet $test"
+
 			# Let's loop the other hosts so they can join the cluster, only 5 times
 			for z in {1..5}
 			do
-				sleep 30 # give the first gear some time to start
+				echo "HOOKS: we're in itteration $z for the joining to the cluster"
+				sleep 5 # give the first gear some time to start
 				echo "quit" | telnet $(echo $master_gear | tr ":" "\n") | grep Connected > /dev/null 2>&1
 					if [ "$?" -ne "1" ]; #Ok
 					then
 						$OPENSHIFT_MARIADB_DIR/bin/control start
 						# We're done!
+						echo "HOOKS: host $OPENSHIFT_GEAR_DNS joined the cluster"
 						echo "1" > $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_INIT_DB
 						break
 					fi
