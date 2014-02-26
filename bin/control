@@ -98,6 +98,9 @@ function init_db {
 	# Start MariaDB
 	./bin/mysqld_safe --defaults-file=$OPENSHIFT_MARIADB_DIR/conf/my.cnf --wsrep_cluster_address='gcomm://' > /dev/null 2>&1 &
 
+	# Wait for MariaDB to Start
+	sleep 15
+
 	# Drop the test database and create our application's database
 	echo "drop database test;
 	create database \`${dbname}\` DEFAULT CHARACTER SET utf8 DEFAULT COLLATE utf8_general_ci;" | ./bin/mysql -u root -S ${socket_file} > /dev/null || error 'Failed to create database' 188
