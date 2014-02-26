@@ -1,7 +1,6 @@
 #!/bin/bash -e
 
 source $OPENSHIFT_CARTRIDGE_SDK_BASH
-source "$OPENSHIFT_MARIADB_DIR/lib/mysql_context"
 
 case "$1" in
   -v|--version)
@@ -15,6 +14,4 @@ mkdir -p $OPENSHIFT_MARIADB_DIR/{log,pid,socket,data,run}
 mv $OPENSHIFT_MARIADB_DIR/conf/my.cnf.erb $OPENSHIFT_MARIADB_DIR/conf/my.cnf.erb.hidden
 
 echo "setup=$OPENSHIFT_GEAR_DNS - has finished setup" 
-
-update_configuration $version
 

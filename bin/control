@@ -1,13 +1,12 @@
 #!/bin/bash
 
 source $OPENSHIFT_CARTRIDGE_SDK_BASH
-source "${OPENSHIFT_MARIADB_DIR}/lib/mysql_context"
 
 export STOPTIMEOUT=10
 
 # Run mariadb commands
 function run_sql {
-  echo "$@" | mysql_context "$OPENSHIFT_MARIADB_DIR/binaries/mariadb/bin/mysql --basedir=$OPENSHIFT_MARIADB_DIR/binaries/mariadb/ -h $OPENSHIFT_MARIADB_DB_HOST -P $OPENSHIFT_MARIADB_DB_PORT -u $OPENSHIFT_MARIADB_DB_USERNAME --password='$OPENSHIFT_MARIADB_DB_PASSWORD' --skip-column-names"
+  echo "$@" | $OPENSHIFT_MARIADB_DIR/binaries/mariadb/bin/mysql --basedir=$OPENSHIFT_MARIADB_DIR/binaries/mariadb/ -h $OPENSHIFT_MARIADB_DB_HOST -P $OPENSHIFT_MARIADB_DB_PORT -u $OPENSHIFT_MARIADB_DB_USERNAME --password='$OPENSHIFT_MARIADB_DB_PASSWORD' --skip-column-names
 }
 
 function is_running {
@@ -63,7 +62,7 @@ function init_db {
 	oo-erb $OPENSHIFT_MARIADB_DIR/conf/my.cnf.erb.hidden > $OPENSHIFT_MARIADB_DIR/conf/my.cnf
 
 	# Initialize the MariaDB databases - basedir is IMPORTANT!
-	mysql_context "$OPENSHIFT_MARIADB_DIR/binaries/mariadb/scripts/mysql_install_db --defaults-file=$OPENSHIFT_MARIADB_DIR/conf/my.cnf --basedir=$OPENSHIFT_MARIADB_DIR/binaries/mariadb/ --datadir=$OPENSHIFT_MARIADB_DIR/data --user=$USER" || error 'Failed to create mariadb database', 119
+	$OPENSHIFT_MARIADB_DIR/binaries/mariadb/scripts/mysql_install_db --defaults-file=$OPENSHIFT_MARIADB_DIR/conf/my.cnf --basedir=$OPENSHIFT_MARIADB_DIR/binaries/mariadb/ --datadir=$OPENSHIFT_MARIADB_DIR/data --user=$USER || error 'Failed to create mariadb database', 119
 
 	client_result ""
 	client_result "MariaDB Galera Cluster ${OPENSHIFT_MARIADB_VERSION} database added.  Please make note of these credentials:"
@@ -93,13 +92,13 @@ function init_db {
 
 	# Drop the test database and create our application's database
 	echo "drop database test;
-	create database \`${dbname}\` DEFAULT CHARACTER SET utf8 DEFAULT COLLATE utf8_general_ci;" | mysql_context "./bin/mysql -u root -S '$socket_file'" > /dev/null || error 'Failed to create database' 188
+	create database \`${dbname}\` DEFAULT CHARACTER SET utf8 DEFAULT COLLATE utf8_general_ci;" | ./bin/mysql -u root -S '$socket_file' > /dev/null || error 'Failed to create database' 188
 
 	# Delete the test user and create our admin user from the generated_username and generated_password
 	echo "                                  
 	delete from user;
 	grant all on *.* to '$username'@'%' identified by '$password' with grant option;
-	flush privileges;" | mysql_context "./bin/mysql -u root -S '$socket_file' mysql" > /dev/null || error "Failed to setup initial root user" 187
+	flush privileges;" | ./bin/mysql -u root -S '$socket_file' mysql > /dev/null || error "Failed to setup initial root user" 187
 
 echo "control=$OPENSHIFT_GEAR_DNS - has finished db-init" 
 
@@ -153,11 +152,11 @@ then
     then
     	# Adding more hosts to the cluster
 	echo "control=$OPENSHIFT_GEAR_DNS - starting mysqld_safe joining $online_gears" 
-        mysql_context "./bin/mysqld_safe --defaults-file=$OPENSHIFT_MARIADB_DIR/conf/my.cnf --wsrep_cluster_address=$online_gears" > /dev/null 2>&1 &
+        ./bin/mysqld_safe --defaults-file=$OPENSHIFT_MARIADB_DIR/conf/my.cnf --wsrep_cluster_address=$online_gears > /dev/null 2>&1 &
     else
     	# Initial Startup (first host)
 	echo "control=$OPENSHIFT_GEAR_DNS - starting mysqld_safe as first host" 
-        mysql_context "./bin/mysqld_safe --defaults-file=$OPENSHIFT_MARIADB_DIR/conf/my.cnf --wsrep_cluster_address='gcomm://'" > /dev/null 2>&1 &
+        ./bin/mysqld_safe --defaults-file=$OPENSHIFT_MARIADB_DIR/conf/my.cnf --wsrep_cluster_address='gcomm://' > /dev/null 2>&1 &
     fi
 
     wait_for_mysqld_availability
@@ -240,7 +239,7 @@ function pre_snapshot {
   local db_port=$OPENSHIFT_MARIADB_DB_PORT
 
   {
-    mysql_context "$OPENSHIFT_MARIADB_DIR/binaries/mariadb/bin/mysqldump --extended-insert --quick -h $db_host -P $db_port -u $OPENSHIFT_MARIADB_DB_USERNAME --password='$OPENSHIFT_MARIADB_DB_PASSWORD' --all-databases --events --triggers --routines --add-drop-table" | /bin/gzip > $dump_file
+    $OPENSHIFT_MARIADB_DIR/binaries/mariadb/bin/mysqldump --extended-insert --quick -h $db_host -P $db_port -u $OPENSHIFT_MARIADB_DB_USERNAME --password='$OPENSHIFT_MARIADB_DB_PASSWORD' --all-databases --events --triggers --routines --add-drop-table | /bin/gzip > $dump_file
   } ||
   {
     warning "Couldn't not dump mariadb! Continuing anyway"
@@ -328,8 +327,8 @@ function post_restore {
       # This approach provides relational consistency and will work with tables, views, triggers, etc
       # TODO: This may not work if the user created another database that has references to this database
       {
-	mysql_context "$OPENSHIFT_MARIADB_DIR/binaries/mariadb/bin/mysqldump -h $NEW_IP -P $OPENSHIFT_MARIADB_DB_PORT -u $NEW_USER --password='$OPENSHIFT_MARIADB_DB_PASSWORD' $OLD_NAME" | \
-          mysql_context "$OPENSHIFT_MARIADB_DIR/binaries/mariadb/bin/mysql -h $NEW_IP -P $OPENSHIFT_MARIADB_DB_PORT -u $NEW_USER --password='$OPENSHIFT_MARIADB_DB_PASSWORD' $NEW_NAME"
+	$OPENSHIFT_MARIADB_DIR/binaries/mariadb/bin/mysqldump -h $NEW_IP -P $OPENSHIFT_MARIADB_DB_PORT -u $NEW_USER --password='$OPENSHIFT_MARIADB_DB_PASSWORD' $OLD_NAME | \
+          $OPENSHIFT_MARIADB_DIR/binaries/mariadb/bin/mysql -h $NEW_IP -P $OPENSHIFT_MARIADB_DB_PORT -u $NEW_USER --password='$OPENSHIFT_MARIADB_DB_PASSWORD' $NEW_NAME
       } || error "Could not rename database" 187
 
       # Drop the old database now that the data has been preserved

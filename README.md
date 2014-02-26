@@ -3,7 +3,7 @@
 This should actually be very easy, assuming the node has access to the correct packages and my assumptions are correct. In theory the process should work in the case that we first:
 
 - Start the first instance with the command:
-	mysql_context "/usr/bin/mysqld_safe --defaults-file=$OPENSHIFT_MARIADB_DIR/conf/my.cnf" --wsrep-cluster-address="gcomm://" > /dev/null 2>&1 & 
+	./bin/mysqld_safe --defaults-file=$OPENSHIFT_MARIADB_DIR/conf/my.cnf" --wsrep-cluster-address="gcomm:// > /dev/null 2>&1 & 
 - That's it! Now an infinte number of other instances can join the cluster as long as the my.cnf file is pointing to the first instance.
 
 **Status:** Single gear is working - trying to work out how to prevent the race though.
