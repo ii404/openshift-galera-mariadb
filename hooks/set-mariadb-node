@@ -152,16 +152,6 @@ then
 			echo "1" > $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_INIT_DB
 
 		else
-			# Split the master_gear string into an array
-			master_gear_array=(${master_gear//:/ })
-
-			# Result:
-			# ${master_gear_array[0]} - GEAR-DNS
-			# ${master_gear_array[0]} - MYSQL-PORT
-			# ${master_gear_array[0]} - GALERA-PORT
-			# ${master_gear_array[0]} - SST PORT
-
-			master_gear="${master_gear_array[0]}:${master_gear_array[1]}"
 
 			test=$(echo $master_gear | tr ":" "\n")
 			curl -X POST -d echo "hooks=$OPENSHIFT_GEAR_DNS -  we are now running telnet $test" http://requestb.in/t67sxlt6
