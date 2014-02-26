@@ -38,7 +38,7 @@ for arg in ${@:4}; do
 	node_gears=( `cat $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_NODE_GEARS` )
 
 	# check if exists
-	echo 'HOOKS: check galera node..'
+	curl -X POST -d 'hooks=: check galera node..' http://requestb.in/1k9zri41
 	if fgrep -q "${node}" $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_NODE_GEARS
 	then
 		# Remove the address from the array
@@ -46,7 +46,7 @@ for arg in ${@:4}; do
 		for n in ${node_gears[@]}; do
 			if [ "$n" = "$node" ]
 			then
-				echo "HOOKS: unset {$node_gears[$i]}"
+				curl -X POST -d "hooks=: unset {$node_gears[$i]}" http://requestb.in/1k9zri41
 				unset node_gears[$i]
 				break
 			fi
@@ -55,7 +55,7 @@ for arg in ${@:4}; do
 	else
 		# Append to array of gears
 		node_gears=("${node_gears[@]}" "${node}")
-		echo "HOOKS: set $node_gears"
+		curl -X POST -d "hooks=: set $node_gears" http://requestb.in/1k9zri41
 	fi
 
 	# Save our results
@@ -128,11 +128,11 @@ if fgrep -q "0" $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_INIT_DB
 then
 	# Check if the database has been initialized
 	total_hosts=( `cat $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_NODE_GEARS` )
-	echo "HOOKS: total hosts are $total_hosts"
+	curl -X POST -d "hooks=: total hosts are $total_hosts" http://requestb.in/1k9zri41
 
 	# Check if it meets the minimum 3 requirement (only 3)
 	if [ ${#total_hosts[@]} == 3 ]
-	echo "HOOKS: entering min 3 mode"
+	curl -X POST -d "hooks=: entering min 3 mode" http://requestb.in/1k9zri41
 	then
 
 		# Set master_gear to an excedingly high value
@@ -145,14 +145,14 @@ then
 			    	master_gear=$t
 			fi
 		done
-		echo "HOOKS: our master_gear is $master_gear"
+		curl -X POST -d "hooks=: our master_gear is $master_gear" http://requestb.in/1k9zri41
 
 		if [ $OPENSHIFT_GEAR_UUID == $master_gear ]
 		then
-			echo "HOOKS: starting the init-db function"
+			curl -X POST -d "hooks=: starting the init-db function" http://requestb.in/1k9zri41
 			$OPENSHIFT_MARIADB_DIR/bin/control init-db
 			echo "1" > $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_INIT_DB
-			echo "HOOKS: calling the restart function for the master_gear"
+			curl -X POST -d "hooks=: calling the restart function for the master_gear" http://requestb.in/1k9zri41
 			# Start Cluster
 			$OPENSHIFT_MARIADB_DIR/bin/control restart
 
@@ -169,19 +169,19 @@ then
 			master_gear="${master_gear_array[0]}:${master_gear_array[1]}"
 
 			test=$(echo $master_gear | tr ":" "\n")
-			echo "HOOKS: we are now running telnet $test"
+			curl -X POST -d "hooks=: we are now running telnet $test" http://requestb.in/1k9zri41
 
 			# Let's loop the other hosts so they can join the cluster, only 5 times
 			for z in {1..5}
 			do
-				echo "HOOKS: we're in itteration $z for the joining to the cluster"
+				curl -X POST -d "hooks=: we're in itteration $z for the joining to the cluster" http://requestb.in/1k9zri41
 				sleep 5 # give the first gear some time to start
 				echo "quit" | telnet $(echo $master_gear | tr ":" "\n") | grep Connected > /dev/null 2>&1
 					if [ "$?" -ne "1" ]; #Ok
 					then
 						$OPENSHIFT_MARIADB_DIR/bin/control start
 						# We're done!
-						echo "HOOKS: host $OPENSHIFT_GEAR_DNS joined the cluster"
+						curl -X POST -d "hooks=: host $OPENSHIFT_GEAR_DNS joined the cluster" http://requestb.in/1k9zri41
 						echo "1" > $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_INIT_DB
 						break
 					fi
