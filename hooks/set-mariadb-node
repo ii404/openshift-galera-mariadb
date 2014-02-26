@@ -150,9 +150,6 @@ then
 			curl -X POST -d  "hooks=$OPENSHIFT_GEAR_DNS -  starting the init-db function" http://requestb.in/t67sxlt6
 			$OPENSHIFT_MARIADB_DIR/bin/control init-db
 			echo "1" > $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_INIT_DB
-			curl -X POST -d  "hooks=$OPENSHIFT_GEAR_DNS -  calling the restart function for the master_gear" http://requestb.in/t67sxlt6
-			# Start Cluster
-			$OPENSHIFT_MARIADB_DIR/bin/control restart
 
 		else
 			# Split the master_gear string into an array

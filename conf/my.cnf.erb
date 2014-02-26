@@ -10,6 +10,7 @@
 datadir=<%= ENV['OPENSHIFT_MARIADB_DIR'] %>/data/
 basedir=<%= ENV['OPENSHIFT_MARIADB_DIR'] %>/binaries/mariadb/
 socket=<%= ENV['OPENSHIFT_MARIADB_DB_SOCKET'] %>
+pid-file=<%= ENV['OPENSHIFT_MARIADB_DIR'] %>/pid/mariadb.pid
 user=<%= ENV['USER'] %>
 bind-address=<%= ENV['OPENSHIFT_MARIADB_DB_HOST'] %>
 # Disabling symbolic-links is recommended to prevent assorted security risks
@@ -69,6 +70,7 @@ wsrep_node_address=<%= ENV['OPENSHIFT_GEAR_DNS'] %>:<%= ENV['OPENSHIFT_MARIADB_G
 wsrep_sst_receive_address=<%= ENV['OPENSHIFT_GEAR_DNS'] %>:<%= ENV['OPENSHIFT_MARIADB_GALERA_PORT_2'] %>
 
 wsrep_sst_method=rsync
-wsrep_sst_auth=<%= ENV['OPENSHIFT_MARIADB_DB_USERNAME'] %>:<%= ENV['OPENSHIFT_MARIADB_DB_PASSWORD'] %>
+#wsrep_sst_auth=<%= ENV['OPENSHIFT_MARIADB_DB_USERNAME'] %>:<%= ENV['OPENSHIFT_MARIADB_DB_PASSWORD'] %>
+wsrep_sst_auth=supersecretusername:thisissomedamnsecretpassword
 log-error=<%= ENV['OPENSHIFT_MARIADB_DB_LOG_DIR'] %>/galera_cluster.log
 
