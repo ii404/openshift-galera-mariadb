@@ -117,13 +117,11 @@ if fgrep -q "1" $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_INIT_DB
 then
   if ! is_running; then
     echo "Starting MariaDB cartridge"
-    echo "control=$OPENSHIFT_GEAR_DNS - starting mariadb" 
     oo-erb $OPENSHIFT_MARIADB_DIR/conf/my.cnf.erb.hidden > $OPENSHIFT_MARIADB_DIR/conf/my.cnf
     
     # Dirty check to see if other hosts are up
     active_gears=(`cat $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_GALERA_GEARS`)
     online_gears=''
-    echo "control=$OPENSHIFT_GEAR_DNS - active_gears=$active_gears" 
     for i in ${active_gears[@]}; 
     do 
 	# Ignore own host
@@ -142,7 +140,6 @@ then
 		echo -e "Warning: $i is not responding! The node which hosts this gear may be offline - please contact your administrator."
 	fi
     done
-    echo "control=$OPENSHIFT_GEAR_DNS - online_gears=$online_gears" 
         
     # We MUST run mysqld_safe from this dir or else it will fail
     cd $OPENSHIFT_MARIADB_DIR/binaries/mariadb
@@ -151,11 +148,9 @@ then
     if [ `echo $online_gears | sed 's/[^,]//g' | wc -c` -gt 2 ];
     then
     	# Adding more hosts to the cluster
-	echo "control=$OPENSHIFT_GEAR_DNS - starting mysqld_safe joining $online_gears" 
         ./bin/mysqld_safe --defaults-file=$OPENSHIFT_MARIADB_DIR/conf/my.cnf --wsrep_cluster_address=$online_gears > /dev/null 2>&1 &
     else
     	# Initial Startup (first host)
-	echo "control=$OPENSHIFT_GEAR_DNS - starting mysqld_safe as first host" 
         ./bin/mysqld_safe --defaults-file=$OPENSHIFT_MARIADB_DIR/conf/my.cnf --wsrep_cluster_address='gcomm://' > /dev/null 2>&1 &
     fi
 
@@ -182,7 +177,6 @@ function wait_for_mysqld_availability {
 
     sleep 1
   done
-echo "control=$OPENSHIFT_GEAR_DNS - we failed waiting for mysqld_availability" 
   return 1
 }
 

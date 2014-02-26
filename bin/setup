@@ -13,5 +13,3 @@ mkdir -p $OPENSHIFT_MARIADB_DIR/{log,pid,socket,data,run}
 # Move cnf files
 mv $OPENSHIFT_MARIADB_DIR/conf/my.cnf.erb $OPENSHIFT_MARIADB_DIR/conf/my.cnf.erb.hidden
 
-echo "setup=$OPENSHIFT_GEAR_DNS - has finished setup" 
-

@@ -6,5 +6,3 @@ case "$1" in
   -v|--version)
     version="$2"
 esac
-
-echo "install=$OPENSHIFT_GEAR_DNS - has finished install" 
