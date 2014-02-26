@@ -1,0 +1,4 @@
+#!/bin/bash
+
+# Tell everyone DB-INIT has been completed
+echo "OPENSHIFT_MARIADB_INIT_DB=`cat $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_INIT_DB`"
