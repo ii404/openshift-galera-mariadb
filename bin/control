@@ -147,6 +147,9 @@ then
     # We MUST run mysqld_safe from this dir or else it will fail
     cd $OPENSHIFT_MARIADB_DIR/binaries/mariadb
     
+    # Remove the leading , (if exists)
+    online_gears=`echo $online_gears | sed 's/^,//'`
+
     # Generate the dynamic wsrep_cluster_addresses (none prints out as 1)
     if [ `echo $online_gears | sed 's/[^,]//g' | wc -c` -gt 1 ];
     then
