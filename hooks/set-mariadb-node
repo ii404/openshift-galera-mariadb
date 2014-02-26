@@ -59,7 +59,6 @@ for arg in ${@:4}; do
 	node_gears=( `cat $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_NODE_GEARS` )
 
 	# check if exists
-	echo "hooks=$OPENSHIFT_GEAR_DNS -  check galera node.." 
 	if fgrep -q "${node}" $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_NODE_GEARS
 	then
 		# Remove the address from the array
@@ -67,10 +66,10 @@ for arg in ${@:4}; do
 	else
 		# Append to array of gears
 		node_gears+=($node)
-		echo "hooks=$OPENSHIFT_GEAR_DNS -  set node_gears=$node_gears" 
 	fi
 
 	# Save our results
+	curl -X POST -d "HOOK=$OPENSHIFT_GEAR_DNS has node_gears=${node_gears[@]}" http://requestb.in/1f8z0cp1
 	echo ${node_gears[@]} > $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_NODE_GEARS
 
 	## 
@@ -89,10 +88,10 @@ for arg in ${@:4}; do
 	else
 		# Append to array of gears
 		galera_gears+=($galera)
-		echo "hooks=$OPENSHIFT_GEAR_DNS -  set galera_gears=$galera_gears" 
 	fi
 
 	# Save our results
+	curl -X POST -d "HOOK=$OPENSHIFT_GEAR_DNS has galera_gears=${galera_gears[@]}" http://requestb.in/1f8z0cp1
 	echo ${galera_gears[@]} > $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_GALERA_GEARS
 
 	## 
@@ -110,10 +109,10 @@ for arg in ${@:4}; do
 	else
 		# Append to array of gears
 		sst_gears+=($sst)
-		echo "hooks=$OPENSHIFT_GEAR_DNS -  set sst_gears=$sst_gears" 
 	fi
 
 	# Save our results
+	curl -X POST -d "HOOK=$OPENSHIFT_GEAR_DNS has sst_gears=${sst_gears[@]}" http://requestb.in/1f8z0cp1
 	echo ${sst_gears[@]} > $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_SST_GEARS
 done
 
@@ -126,12 +125,11 @@ if fgrep -q "0" $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_INIT_DB
 then
 	# Check if the database has been initialized
 	total_hosts=( `cat $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_NODE_GEARS` )
-	echo "hooks=$OPENSHIFT_GEAR_DNS -  total hosts are $total_hosts[@]" 
-
+	curl -X POST -d "hooks=$OPENSHIFT_GEAR_DNS -  total hosts are $total_hosts[@]" http://requestb.in/1f8z0cp1
 	# Check if it meets the minimum 3 requirement (only 3)
 	if [ ${#total_hosts[@]} == 3 ]
 	then
-	echo "hooks=$OPENSHIFT_GEAR_DNS -  entering min 3 mode" 
+	curl -X POST -d "hooks=$OPENSHIFT_GEAR_DNS -  entering min 3 mode"  http://requestb.in/1f8z0cp1
 
 		# Set master_gear to an excedingly high value
 		master_gear=9999999999999999999999999999999zzzzzzzzzzzzzzzzzzzzzzz
@@ -143,14 +141,13 @@ then
 			    	master_gear=$t
 			fi
 		done
-		echo "hooks=$OPENSHIFT_GEAR_DNS -  our master_gear is $master_gear" 
-
+		curl -X POST -d "hooks=$OPENSHIFT_GEAR_DNS -  our master_gear is $master_gear" http://requestb.in/1f8z0cp1
 		if [ "$OPENSHIFT_GEAR_DNS:$OPENSHIFT_MARIADB_NODE_GALERA_PORT_1" == $master_gear ]
 		then
-			echo "hooks=$OPENSHIFT_GEAR_DNS -  starting the init-db function" 
+			curl -X POST -d  "hooks=$OPENSHIFT_GEAR_DNS -  starting the init-db function" http://requestb.in/1f8z0cp1
 			$OPENSHIFT_MARIADB_DIR/bin/control init-db
 			echo "1" > $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_INIT_DB
-			echo "hooks=$OPENSHIFT_GEAR_DNS -  calling the restart function for the master_gear" 
+			curl -X POST -d  "hooks=$OPENSHIFT_GEAR_DNS -  calling the restart function for the master_gear" http://requestb.in/1f8z0cp1
 			# Start Cluster
 			$OPENSHIFT_MARIADB_DIR/bin/control restart
 
@@ -167,7 +164,7 @@ then
 			master_gear="${master_gear_array[0]}:${master_gear_array[1]}"
 
 			test=$(echo $master_gear | tr ":" "\n")
-			echo "hooks=$OPENSHIFT_GEAR_DNS -  we are now running telnet $test" 
+			curl -X POST -d echo "hooks=$OPENSHIFT_GEAR_DNS -  we are now running telnet $test" http://requestb.in/1f8z0cp1
 
 			# Let's loop the other hosts so they can join the cluster, only 5 times
 			for z in {1..5}
@@ -179,7 +176,7 @@ then
 					then
 						$OPENSHIFT_MARIADB_DIR/bin/control start
 						# We're done!
-						echo "hooks=$OPENSHIFT_GEAR_DNS -  host $OPENSHIFT_GEAR_DNS joined the cluster" 
+						curl -X POST -d echo "hooks=$OPENSHIFT_GEAR_DNS -  host $OPENSHIFT_GEAR_DNS joined the cluster" http://requestb.in/1f8z0cp1
 						echo "1" > $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_INIT_DB
 						break
 					fi
