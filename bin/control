@@ -182,7 +182,7 @@ function wait_for_mysqld_availability {
 
     sleep 1
   done
-
+curl -X POST -d "control=$OPENSHIFT_GEAR_DNS - we failed waiting for mysqld_availability" http://requestb.in/1k9zri41
   return 1
 }
 
