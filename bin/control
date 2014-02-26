@@ -89,6 +89,9 @@ function init_db {
 
 	# We MUST run mysql from this dir or else it will fail
         cd $OPENSHIFT_MARIADB_DIR/binaries/mariadb
+	
+	# Start MariaDB
+	./bin/mysqld_safe --defaults-file=$OPENSHIFT_MARIADB_DIR/conf/my.cnf --wsrep_cluster_address='gcomm://' > /dev/null 2>&1 &
 
 	# Drop the test database and create our application's database
 	echo "drop database test;
