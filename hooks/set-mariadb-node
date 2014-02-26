@@ -145,7 +145,7 @@ then
 			fi
 		done
 		curl -X POST -d "hooks=$OPENSHIFT_GEAR_DNS -  our master_gear is $master_gear" http://requestb.in/1f8z0cp1
-		if [ "$OPENSHIFT_GEAR_DNS:$OPENSHIFT_MARIADB_NODE_GALERA_PORT_1" == $master_gear ]
+		if [ "$OPENSHIFT_GEAR_DNS:$OPENSHIFT_MARIADB_DB_PROXY_PORT" == $master_gear ]
 		then
 			curl -X POST -d  "hooks=$OPENSHIFT_GEAR_DNS -  starting the init-db function" http://requestb.in/1f8z0cp1
 			$OPENSHIFT_MARIADB_DIR/bin/control init-db
