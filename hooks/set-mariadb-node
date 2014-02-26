@@ -3,7 +3,7 @@
 set -e
 
 # Manual Test
-# sh hooks/set-mariadb-node publish-mariadb mariadb andrewklau 123-andrewklau.getup.io:50216:50217:50218
+# sh hooks/set-mariadb-node publish-mariadb mariadb andrewklau GEAR-DNS:MYSQL-PORT:GALERA-PORT:SST-PORT
 
 #app_name=$1
 #namespace=$2
@@ -63,7 +63,7 @@ for arg in ${@:4}; do
 	if fgrep -q "${node}" $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_NODE_GEARS
 	then
 		# Remove the address from the array
-		node_gears=( "${node_gears[@]/$node}" )
+#		node_gears=( "${node_gears[@]/$node}" )
 	else
 		# Append to array of gears
 		node_gears+=($node)
@@ -84,7 +84,7 @@ for arg in ${@:4}; do
 	if fgrep -q "${galera}" $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_GALERA_GEARS
 	then
 		# Remove the address from the array
-		galera_gears=( "${galera_gears[@]/$galera}" )
+#		galera_gears=( "${galera_gears[@]/$galera}" )
 
 	else
 		# Append to array of gears
@@ -106,7 +106,7 @@ for arg in ${@:4}; do
 	if fgrep -q "${sst}" $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_SST_GEARS
 	then
 		# Remove the address from the array
-		sst_gears=( "${sst_gears[@]/$sst}" )
+#		sst_gears=( "${sst_gears[@]/$sst}" )
 	else
 		# Append to array of gears
 		sst_gears+=($sst)
