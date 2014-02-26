@@ -58,21 +58,17 @@ Provides:
 Publishes:
   publish-mariadb-node:
     Type: NET_TCP:mariadb-cluster
-  publish-mariadb-galera-node:
-    Type: NET_TCP:mariadb-galera
-  publish-mariadb-sst-node:
-    Type: NET_TCP:mariadb-sst
+  publish-db-init:
+    Type: NET_TCP:db-init
   publish-db-connection-info:
     Type: ENV:NET_TCP:db:connection-info
 Subscribes:
   set-mariadb-node:
     Type: NET_TCP:mariadb-cluster
-  set-mariadb-galera-node:
-    Type: NET_TCP:mariadb-galera
-  set-mariadb-sst-node:
-    Type: NET_TCP:mariadb-sst
+  set-db-init:
+    Type: NET_TCP:db-init
 Scaling:
-  Min: 2
+  Min: 3
   Max: -1
 Endpoints:
 - Private-IP-Name: DB_HOST

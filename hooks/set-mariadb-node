@@ -14,16 +14,167 @@ for arg in ${@:4}; do
 	gear=$(echo "$arg" | cut -f 1 -d '=')
 	addr=$(echo "$arg" | cut -f 3 -d '=')
 
-echo "arg=$arg gear=$gear addr=$addr"
+	# addr will have a format like this: 
+	# OPENSHIFT_MARIADB_NODE=GEAR-DNS:MYSQL-PORT:GALERA-PORT:SST-PORT
 
-	if fgrep -q "$addr" $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_NODE_GEARS
+	# Split the addr string into an array
+	addr_array=(${addr//:/ })
+
+	# Result:
+	# ${addr_array[0]} - GEAR-DNS
+	# ${addr_array[0]} - MYSQL-PORT
+	# ${addr_array[0]} - GALERA-PORT
+	# ${addr_array[0]} - SST PORT
+
+	node="${addr_array[0]}:${addr_array[1]}"
+	galera="${addr_array[0]}:${addr_array[2]}"
+	sst="${addr_array[0]}:${addr_array[3]}"
+	
+	## 
+	# MariaDB End Points
+	##
+
+	# List of Nodes gears
+	node_gears=( `cat $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_NODE_GEARS` )
+
+	# check if exists
+	if fgrep -q "${node}" $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_NODE_GEARS
 	then
-		# Remove the address from the list
-		sed "/${addr}/d" $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_NODE_GEARS
+		# Remove the address from the array
+		i=0
+		for n in ${node_gears[@]}; do
+			if [ "$n" = "$node" ]
+			then
+				unset node_gears[$i]
+				break
+			fi
+			let i++
+		done
+	else
+		# Append to array of gears
+		node_gears=("${node_gears[@]}" "${node}")
+	fi
+
+	# Save our results
+	echo $node_gears > $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_NODE_GEARS
+
+	## 
+	# Galera End Points
+	##
+
+	# List Galera gears
+	galera_gears=( `cat $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_GALERA_GEARS` )
+
+	# check if exists
+	if fgrep -q "${galera}" $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_GALERA_GEARS
+	then
+		# Remove the address from the array
+		i=0
+		for g in ${galera_gears[@]}; do
+			if [ "$g" = "$galera" ]
+			then
+				unset galera_gears[$i]
+				break
+			fi
+			let i++
+		done
 
 	else
-		# Append to list of gears
-		echo -e "${addr}\n" >> $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_NODE_GEARS
-	fi	
+		# Append to array of gears
+		galera_gears=("${galera_gears[@]}" "${galera}")
+	fi
+
+	# Save our results
+	echo $galera_gears > $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_GALERA_GEARS
+
+	## 
+	# SST End Points
+	##
+
+	# List of SST gears
+	sst_gears=( `cat $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_SST_GEARS` )
+	
+	# check if exists
+	if fgrep -q "${sst}" $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_SST_GEARS
+	then
+		# Remove the address from the array
+		i=0
+		for s in ${sst_gears[@]}; do
+			if [ "$s" = "$sst" ]
+			then
+				unset sst_gears[$i]
+				break
+			fi
+			let i++
+		done
+	else
+		# Append to array of gears
+		sst_gears=("${sst_gears[@]}" "${sst}")
+	fi
+
+	# Save our results
+	echo $sst_gears > $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_SST_GEARS
 done
+
+##
+# Configure DB_INIT
+##
+
+# Check if DB has been initialized (1 = true, 0 = false)
+if fgrep -q "0" $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_INIT_DB
+then
+	# Check if the database has been initialized
+	total_hosts=( `cat $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_NODE_GEARS` )
+
+	# Check if it meets the minimum 3 requirement (only 3)
+	if [ ${#total_hosts[@]} == 3 ]
+	then
+
+		# Set master_gear to an excedingly high value
+		master_gear=9999999999999999999999999999999zzzzzzzzzzzzzzzzzzzzzzz
+		# Determine lowest UUID with simple comparrision
+		for t in "${#total_hosts[@]}"
+		do 
+			if [ $t \< $master_gear ]
+			then
+			    	master_gear=$t
+			fi
+		done
+
+		if [ $OPENSHIFT_GEAR_UUID == $master_gear ]
+		then
+			$OPENSHIFT_MARIADB_DIR/bin/control init-db
+			echo "1" > $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_INIT_DB
+			# Start Cluster
+			$OPENSHIFT_MARIADB_DIR/bin/control restart
+
+		else
+			# Split the master_gear string into an array
+			master_gear_array=(${master_gear//:/ })
+
+			# Result:
+			# ${master_gear_array[0]} - GEAR-DNS
+			# ${master_gear_array[0]} - MYSQL-PORT
+			# ${master_gear_array[0]} - GALERA-PORT
+			# ${master_gear_array[0]} - SST PORT
+
+			master_gear="${master_gear_array[0]}:${master_gear_array[1]}"
+
+			# Let's loop the other hosts so they can join the cluster, only 5 times
+			for z in {1..5}
+			do
+				sleep 30 # give the first gear some time to start
+				echo "quit" | telnet $(echo $master_gear | tr ":" "\n") | grep Connected > /dev/null 2>&1
+					if [ "$?" -ne "1" ]; #Ok
+					then
+						$OPENSHIFT_MARIADB_DIR/bin/control start
+						# We're done!
+						echo "1" > $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_INIT_DB
+						break
+					fi
+			done
+			
+		fi
+	fi
+fi
 

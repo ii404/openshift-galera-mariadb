@@ -19,4 +19,5 @@ This should actually be very easy, assuming the node has access to the correct p
 - Use the ssh private to do inter gear routing tests. Lets avoid relying on telnet!
 - Make sure the ENV variables are properly sharing the variables
 - Verify logic and possible loops or data corruption
+- Do the upgrade/snapshot/backup scripts
 - Test!

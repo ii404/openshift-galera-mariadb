@@ -1,72 +1,10 @@
 #!/bin/bash -e
 
 source $OPENSHIFT_CARTRIDGE_SDK_BASH
-source "${OPENSHIFT_MARIADB_DIR}/lib/mysql_context"
+source "$OPENSHIFT_MARIADB_DIR/lib/mysql_context"
 
 case "$1" in
   -v|--version)
     version="$2"
 esac
-
-# Add OPENSHIFT_MARIADB_VERSION variable to help mysql_context
-# choose the right version. Also need to be exported for install.
-env_dir="${OPENSHIFT_MARIADB_DIR}/env"
-set_env_var 'OPENSHIFT_MARIADB_VERSION' $version $env_dir
-export OPENSHIFT_MARIADB_VERSION=$version
-
-
-## 
-#
-# Starting the galera cluster is a three step process:
-#   1. Start first node and use mysql_install_db
-#   2. Restart the first node to initiate the galera cluster
-#   3. Join the other hosts to the cluster
-#
-##
-
-# Check if this is the first host in cluster
-# This method won't work.. 
-#if [ `wc -l $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_NODE_GEARS | cut -f1 -d" "` -lt 2 ]
-#then
-
-# Generate username, password, and db name and create env variables
-echo 'Generating username and password'
-
-username=$(generate_username)
-password=$(generate_password)
-
-echo "$username" > $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_DB_USERNAME
-echo "$password" > $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_DB_PASSWORD
-echo "mysql://$username:$password@$OPENSHIFT_MARIADB_DB_HOST:$OPENSHIFT_MARIADB_DB_PORT/" > $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_DB_URL
-
-#backward comat to mysql
-echo "$username" > $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MYSQL_DB_USERNAME
-echo "$password" > $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MYSQL_DB_PASSWORD
-echo "mysql://$username:$password@$OPENSHIFT_MARIADB_DB_HOST:$OPENSHIFT_MARIADB_DB_PORT/" > $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MYSQL_DB_URL
-
-echo 'Bootstrap MariaDB'
-
-# Setup the my-cnf Files
-oo-erb $OPENSHIFT_MARIADB_DIR/conf/my.cnf.erb.hidden > $OPENSHIFT_MARIADB_DIR/conf/my.cnf
-
-# Initialize the MariaDB databases - basedir is IMPORTANT!
-mysql_context "$OPENSHIFT_MARIADB_DIR/binaries/mariadb/scripts/mysql_install_db --defaults-file=$OPENSHIFT_MARIADB_DIR/conf/my.cnf --basedir=$OPENSHIFT_MARIADB_DIR/binaries/mariadb/ --datadir=$OPENSHIFT_MARIADB_DIR/data --user=$USER" || error 'Failed to create mariadb database', 119
-
-client_result ""
-client_result "MariaDB Galera Cluster ${OPENSHIFT_MARIADB_VERSION} database added.  Please make note of these credentials:"
-client_result ""
-client_result "       Root User: $username"
-client_result "   Root Password: $password"
-client_result "   Database Name: $OPENSHIFT_APP_NAME"
-client_result ""
-
-client_result "Connection URL: mysql://$OPENSHIFT_MARIADB_DB_HOST:$OPENSHIFT_MARIADB_DB_PORT/"
-client_result ""
-client_result "You can manage your new MariaDB database by also embedding phpmyadmin."
-client_result "The phpmyadmin username and password will be the same as the MariaDB credentials above."
-
-cart_props "connection_url=mysql://$OPENSHIFT_MARIADB_DB_HOST:$OPENSHIFT_MARIADB_DB_PORT/"
-cart_props "username=$username"
-cart_props "password=$password"
-cart_props "database_name=$OPENSHIFT_APP_NAME"
 
