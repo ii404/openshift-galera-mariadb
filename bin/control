@@ -92,6 +92,10 @@ function init_db {
 	username=$OPENSHIFT_MARIADB_DB_USERNAME
 	password=$OPENSHIFT_MARIADB_DB_PASSWORD
 
+
+	# Generate my.conf
+	oo-erb $OPENSHIFT_MARIADB_DIR/conf/my.cnf.erb.hidden > $OPENSHIFT_MARIADB_DIR/conf/my.cnf
+
 	# We MUST run mysql from this dir or else it will fail
         cd $OPENSHIFT_MARIADB_DIR/binaries/mariadb
 	
