@@ -80,3 +80,13 @@ wsrep_sst_receive_address=<%= ENV['OPENSHIFT_GEAR_DNS'] %>:<%= ENV['OPENSHIFT_MA
 wsrep_sst_method=rsync
 log-error=<%= ENV['OPENSHIFT_MARIADB_DB_LOG_DIR'] %>/galera_cluster.log
 
+
+# Should Add this:
+# Command to call when node status or cluster membership changes.
+# Will be passed all or some of the following options:
+# --status - new status of this node
+# --uuid - UUID of the cluster
+# --primary - whether the component is primary or not ("yes"/"no")
+# --members - comma-separated list of members
+# --index - index of this node in the list
+# wsrep_notify_cmd=/usr/local/bin/wsrep_notify.sh
