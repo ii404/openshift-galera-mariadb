@@ -71,7 +71,7 @@ wsrep_node_name=<%= ENV['OPENSHIFT_GEAR_DNS'] %>
 # Selinux won't let us bind to 0.0.0.0, so specify the loopback address
 # See http://www.codership.com/wiki/doku.php?id=galera_parameters
 # Testing: pc.wait_prim=no
-#wsrep_provider_options="gmcast.listen_addr=tcp://<%= ENV['OPENSHIFT_MARIADB_DB_HOST'] %>:<%= ENV['OPENSHIFT_MARIADB_GALERA_PORT_1'] %>;pc.wait_prim=no"
+wsrep_provider_options="gmcast.listen_addr=tcp://<%= ENV['OPENSHIFT_MARIADB_DB_HOST'] %>:<%= ENV['OPENSHIFT_MARIADB_GALERA_PORT_1'] %>;pc.wait_prim=no"
 #wsrep_provider_options="ist.recv_addr=<ec2_private_ipv4>" 
 
 # Define the default port (to listen on)
