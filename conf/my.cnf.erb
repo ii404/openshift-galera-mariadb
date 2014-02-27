@@ -79,7 +79,7 @@ wsrep_node_address=<%= ENV['OPENSHIFT_GEAR_DNS'] %>:<%= ENV['OPENSHIFT_MARIADB_N
 
 wsrep_sst_method=rsync
 # Define the SST port to RECEIVE on - IMPORTANT TO USE THE PUBLIC PORT. We define the local port in the custom wsrep_sst_rsync script
-wsrep_sst_receive_address=<%= ENV['OPENSHIFT_GEAR_DNS'] %>:<%= ENV['OPENSHIFT_MARIADB_DB_PROXY_PORT'] %>
+wsrep_sst_receive_address=<%= ENV['OPENSHIFT_GEAR_DNS'] %>:<%= ENV['OPENSHIFT_MARIADB_NODE_GALERA_PORT_2'] %>
 
 # rsync doesn't use auth
 # wsrep_sst_auth=<%= ENV['OPENSHIFT_MARIADB_DB_USERNAME'] %>:<%= ENV['OPENSHIFT_MARIADB_DB_PASSWORD'] %>
