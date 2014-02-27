@@ -4,11 +4,6 @@ source $OPENSHIFT_CARTRIDGE_SDK_BASH
 
 export STOPTIMEOUT=10
 
-# Setup HOSTALIASES
-echo "$OPENSHIFT_GEAR_DNS $OPENSHIFT_MARIADB_DB_HOST" > $OPENSHIFT_MARIADB_DIR/.hosts
-export HOSTALIASES=$OPENSHIFT_MARIADB_DIR/.hosts
-
-
 # Run mariadb commands
 function run_sql {
   echo "$@" | $OPENSHIFT_MARIADB_DIR/binaries/mariadb/bin/mysql --basedir=$OPENSHIFT_MARIADB_DIR/binaries/mariadb/ -h $OPENSHIFT_MARIADB_DB_HOST -P $OPENSHIFT_MARIADB_DB_PORT -u $OPENSHIFT_MARIADB_DB_USERNAME --password='$OPENSHIFT_MARIADB_DB_PASSWORD' --skip-column-names
@@ -91,10 +86,6 @@ function init_db {
 	socket_file=$OPENSHIFT_MARIADB_DB_SOCKET
 	username=$OPENSHIFT_MARIADB_DB_USERNAME
 	password=$OPENSHIFT_MARIADB_DB_PASSWORD
-
-
-	# Generate my.conf
-	oo-erb $OPENSHIFT_MARIADB_DIR/conf/my.cnf.erb.hidden > $OPENSHIFT_MARIADB_DIR/conf/my.cnf
 
 	# We MUST run mysql from this dir or else it will fail
         cd $OPENSHIFT_MARIADB_DIR/binaries/mariadb
