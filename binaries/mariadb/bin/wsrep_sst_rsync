@@ -202,10 +202,10 @@ then
 # Modification to work with OpenShift
 ##
 
-    ADDR=$OPENSHIFT_MARIADB_DB_HOST:$RSYNC_PORT # listen on our loopback address
+    ADDR=$OPENSHIFT_MARIADB_DB_HOST:$OPENSHIFT_MARIADB_GALERA_PORT_2 # listen on our loopback address
     RSYNC_PORT=$OPENSHIFT_MARIADB_GALERA_PORT_2 # listen to our internal port
 
-echo "The JOINER will connect to $ADDR $RSYNC_PORT"
+echo "The JOINER will connect to $ADDR"
 
 #
 #    ADDR=$WSREP_SST_OPT_ADDR
@@ -238,10 +238,10 @@ gid = $MYGID
     path = $WSREP_LOG_DIR
 EOF
 
-#    rm -rf "$DATA"/ib_logfile* # we don't want old logs around
+    rm -rf "$DATA"/ib_logfile* # we don't want old logs around
 
-    # listen at all interfaces (for firewalled setups)
-    rsync --daemon --port $RSYNC_PORT --config "$RSYNC_CONF"
+    # only listen on our loopback address to avoid selinux issues
+    rsync --daemon --address $OPENSHIFT_MARIADB_DB_HOST --port $RSYNC_PORT --config "$RSYNC_CONF"
 
     until check_pid_and_port $RSYNC_PID $RSYNC_PORT
     do

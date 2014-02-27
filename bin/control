@@ -44,8 +44,10 @@ function init_db {
 	# Generate username, password, and db name and create env variables
 	echo 'Generating username and password'
 
-	username=$(generate_username)
-	password=$(generate_password)
+#	username=$(generate_username)
+#	password=$(generate_password)
+username='admin'
+password='pass'
 
 	echo "$username" > $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_DB_USERNAME
 	echo "$password" > $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_DB_PASSWORD

@@ -154,7 +154,8 @@ then
 					if [ "$?" -ne "1" ]; #Ok
 					then
 						# We're done!
-						echo "1" > $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_INIT_DB
+						$OPENSHIFT_MARIADB_DIR/bin/control init-db
+						# echo "1" > $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_INIT_DB
 						$OPENSHIFT_MARIADB_DIR/bin/control start
 						break
 					fi
