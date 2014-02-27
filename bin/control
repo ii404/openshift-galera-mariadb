@@ -359,11 +359,22 @@ function cleanup_dump {
   rm -f $OPENSHIFT_DATA_DIR/mariadb_db_dbname
 }
 
+function rsync_checks {
+    rsync_pid=$(ps aux | grep "rsync" | grep -v grep | awk '{print $2}')
+    if [ ! -z $rsync_pid ]; then
+        echo "rsync daemon is still running, probably because mysql was not shutdown nicely, killing $rsync_pid ..."
+        kill -9 $rsync_pid
+        while kill -0 $rsync_pid; do echo '.'; done
+        echo "rsync daemon killed succesfully"
+    fi
+}
+
 case "$1" in
   init-db)
     init_db
   ;;
   start)
+    rsync_checks
     start
   ;;
   stop)
