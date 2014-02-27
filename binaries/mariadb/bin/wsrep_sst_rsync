@@ -202,7 +202,7 @@ then
 # Modification to work with OpenShift
 ##
 
-    ADDR=$OPENSHIFT_MARIADB_DB_HOST # listen on our loopback address
+    ADDR=$OPENSHIFT_MARIADB_DB_HOST:$RSYNC_PORT # listen on our loopback address
     RSYNC_PORT=$OPENSHIFT_MARIADB_GALERA_PORT_2 # listen to our internal port
 
 echo "The JOINER will connect to $ADDR $RSYNC_PORT"
