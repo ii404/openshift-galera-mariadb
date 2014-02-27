@@ -158,7 +158,7 @@ then
 			do
 				curl -X POST -d  "hooks=$OPENSHIFT_GEAR_DNS -  we're in itteration $z for the joining to the cluster" http://requestb.in/t67sxlt6
 				# give the first gear some time to start
-				sleep 5
+				sleep 20
 				echo "quit" | telnet $(echo $master_gear | tr ":" "\n") | grep Connected > /dev/null 2>&1
 					if [ "$?" -ne "1" ]; #Ok
 					then
