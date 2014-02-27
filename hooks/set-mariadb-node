@@ -156,7 +156,7 @@ then
 						# We're done!
 						$OPENSHIFT_MARIADB_DIR/bin/control init-db
 						# echo "1" > $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_INIT_DB
-						$OPENSHIFT_MARIADB_DIR/bin/control start
+						$OPENSHIFT_MARIADB_DIR/bin/control restart
 						break
 					fi
 			done
