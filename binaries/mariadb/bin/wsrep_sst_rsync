@@ -203,7 +203,10 @@ then
 ##
 
     ADDR=$OPENSHIFT_MARIADB_DB_HOST # listen on our loopback address
-    RSYNC_PORT=$OPENSHIFT_MARIADB_NODE_GALERA_PORT_2 # listen to our internal port
+    RSYNC_PORT=$OPENSHIFT_MARIADB_GALERA_PORT_2 # listen to our internal port
+
+echo "The JOINER will connect to $ADDR $RSYNC_PORT"
+
 #
 #    ADDR=$WSREP_SST_OPT_ADDR
 #    RSYNC_PORT=$(echo $ADDR | awk -F ':' '{ print $2 }')
