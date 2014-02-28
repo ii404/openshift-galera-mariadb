@@ -79,7 +79,7 @@ wsrep_provider_options="gmcast.listen_addr=tcp://<%= ENV['OPENSHIFT_MARIADB_DB_H
 wsrep_node_address=<%= ENV['OPENSHIFT_GEAR_DNS'] %>:<%= ENV['OPENSHIFT_MARIADB_NODE_GALERA_PORT_1'] %>
 
 # IMPORTANT - using patched wsrep_sst_mysqldump we grab the public MYSQL port here - IMPORTANT
-# wsrep_sst_receive_address=<%= ENV['OPENSHIFT_GEAR_DNS'] %>:<%= ENV['OPENSHIFT_MARIADB_DB_PROXY_PORT'] %>
+wsrep_sst_receive_address=<%= ENV['OPENSHIFT_GEAR_DNS'] %>:<%= ENV['OPENSHIFT_MARIADB_DB_PROXY_PORT'] %>
 
 wsrep_sst_method=mysqldump
 #wsrep_sst_auth=<%= ENV['OPENSHIFT_MARIADB_DB_USERNAME'] %>:<%= ENV['OPENSHIFT_MARIADB_DB_PASSWORD'] %>
