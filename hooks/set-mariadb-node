@@ -156,7 +156,7 @@ then
 						# We're done!
 						$OPENSHIFT_MARIADB_DIR/bin/control init-db
 						
-						sleep 20
+						sleep 10
 						# Restart the servers to join the cluster
 						$OPENSHIFT_MARIADB_DIR/bin/control restart
 						break
