@@ -46,6 +46,9 @@ function init_db {
 
 #	username=$(generate_username)
 #	password=$(generate_password)
+
+# Temporary User/Pass while I test mysqldump
+# later on add logic to setup an ENV variable version
 username='admin'
 password='pass'
 
@@ -92,8 +95,8 @@ password='pass'
 	# We MUST run mysql from this dir or else it will fail
         cd $OPENSHIFT_MARIADB_DIR/binaries/mariadb
 	
-	# Start MariaDB
-	./bin/mysqld_safe --defaults-file=$OPENSHIFT_MARIADB_DIR/conf/my.cnf --wsrep_cluster_address='gcomm://' > /dev/null 2>&1 &
+	# Start MariaDB (standalone)
+	./bin/mysqld_safe --defaults-file=$OPENSHIFT_MARIADB_DIR/conf/my.cnf > /dev/null 2>&1 &
 
 	# Wait for MariaDB to Start
 	sleep 15
