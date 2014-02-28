@@ -24,3 +24,4 @@ then
 	echo "1" > $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_INIT_DB
 fi
 
+done
