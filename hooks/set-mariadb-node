@@ -144,20 +144,26 @@ then
 		if [ "$OPENSHIFT_GEAR_DNS:$OPENSHIFT_MARIADB_DB_PROXY_PORT" == $master_gear ]
 		then
 			$OPENSHIFT_MARIADB_DIR/bin/control init-db
+
+			# Give it some time to settle
+			sleep 5
+			# Restart the gear to start the cluster
+			$OPENSHIFT_MARIADB_DIR/bin/control restart
+
 		else
 			# Let's loop the other hosts so they can join the cluster, only 5 times
 			for z in {1..5}
 			do
 				# give the first gear some time to start
-				sleep 20
+				sleep 50
 				echo "quit" | telnet $(echo $master_gear | tr ":" "\n") | grep Connected > /dev/null 2>&1
 					if [ "$?" -ne "1" ]; #Ok
 					then
-						# We're done!
 						$OPENSHIFT_MARIADB_DIR/bin/control init-db
 						
-						sleep 10
-						# Restart the servers to join the cluster
+						# Give it some time to settle
+						sleep 5
+						# Restart the gears to join the cluster
 						$OPENSHIFT_MARIADB_DIR/bin/control restart
 						break
 					fi
