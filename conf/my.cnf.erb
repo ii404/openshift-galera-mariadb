@@ -77,7 +77,7 @@ wsrep_provider_options="gmcast.listen_addr=tcp://<%= ENV['OPENSHIFT_MARIADB_DB_H
 # Define the default port (to listen on)
 wsrep_node_address=<%= ENV['OPENSHIFT_GEAR_DNS'] %>:<%= ENV['OPENSHIFT_MARIADB_NODE_GALERA_PORT_1'] %>
 
-# Define the SST port to RECEIVE on - IMPORTANT TO USE THE PUBLIC PORT. We define the local port in the custom wsrep_sst_rsync script
+# IMPORTANT - using patched wsrep_sst_mysqldump we grab the public MYSQL port here - IMPORTANT
 wsrep_sst_receive_address=<%= ENV['OPENSHIFT_GEAR_DNS'] %>:<%= ENV['OPENSHIFT_MARIADB_DB_PROXY_PORT'] %>
 
 wsrep_sst_method=mysqldump

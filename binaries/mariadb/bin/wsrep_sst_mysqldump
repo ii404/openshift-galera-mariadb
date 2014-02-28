@@ -17,25 +17,20 @@
 
 # This is a reference script for mysqldump-based state snapshot tansfer
 
+. $(dirname $0)/wsrep_sst_common
+
 # OpenShift Stuff
 source $OPENSHIFT_CARTRIDGE_SDK_BASH
 
-# We need to match our receiving address with it's OpenShift port
-#node_gears=( `cat $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_NODE_GEARS` )
-#for i in "${node_gears[@]}"
-#do 
-#	# split into array
-#	t=$(echo $i | tr ":" "\n")
-#
-#	if [ $t[0] = $WSREP_SST_OPT_HOST ]
-#	then
-#	    	$WSREP_SST_OPT_PORT=$t[1]
-#	fi
-#done
+echo "###################### PRE OPENSHIFT PATCH ###################### "
+echo " We would have connected to $WSREP_SST_OPT_HOST through $WSREP_SST_OPT_PORT "
 
 
-
-. $(dirname $0)/wsrep_sst_common
+ADDR=$WSREP_SST_OPT_ADDR
+WSREP_SST_OPT_PORT=$(echo $ADDR | awk -F ':' '{ print $2 }')
+echo "###################### OPENSHIFT PATCH ###################### "
+echo " We will be connecting to $WSREP_SST_OPT_HOST through $WSREP_SST_OPT_PORT "
+echo "###################### OPENSHIFT PATCH ###################### "
 
 EINVAL=22
 
