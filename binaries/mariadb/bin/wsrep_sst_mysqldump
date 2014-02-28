@@ -19,19 +19,6 @@
 
 . $(dirname $0)/wsrep_sst_common
 
-# OpenShift Stuff
-source $OPENSHIFT_CARTRIDGE_SDK_BASH
-
-echo "###################### PRE OPENSHIFT PATCH ###################### "
-echo " We would have connected to $WSREP_SST_OPT_HOST through $WSREP_SST_OPT_PORT "
-
-
-ADDR=$WSREP_SST_OPT_ADDR
-WSREP_SST_OPT_PORT=$(echo $ADDR | awk -F ':' '{ print $2 }')
-echo "###################### OPENSHIFT PATCH ###################### "
-echo " We will be connecting to $WSREP_SST_OPT_HOST through $WSREP_SST_OPT_PORT "
-echo "###################### OPENSHIFT PATCH ###################### "
-
 EINVAL=22
 
 local_ip()
