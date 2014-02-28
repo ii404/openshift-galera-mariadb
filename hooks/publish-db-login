@@ -1,12 +1,11 @@
 #!/bin/bash
 
 if [ fgrep -q "0" $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_INIT_DB ] && [ -f $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_DB_TEMP ]
+then
 	# If above are met, we're uninitialized
 	# Broadcast our generated login details
 	echo "OPENSHIFT_MARIADB_LOGIN_DETAILS=`cat $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_DB_TEMP`"
-else
-	# We may already be initialized but not have the correct password, so lets do a check before aimlessly broadcasting
-	if [ -f $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_DB_USERNAME ] && [ -f $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_DB_PASSWORD ]; then
-		echo "OPENSHIFT_MARIADB_LOGIN_DETAILS=`cat $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_DB_USERNAME`:`cat $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_DB_PASSWORD`"
-	fi
+# We may already be initialized but not have the correct password, so lets do a check before aimlessly broadcasting
+elif [ -f $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_DB_USERNAME ] && [ -f $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_DB_PASSWORD ]; then
+	echo "OPENSHIFT_MARIADB_LOGIN_DETAILS=`cat $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_DB_USERNAME`:`cat $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_DB_PASSWORD`"
 fi
