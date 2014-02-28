@@ -12,4 +12,5 @@ mkdir -p $OPENSHIFT_MARIADB_DIR/{log,pid,socket,data,run}
 
 # Move cnf files
 mv $OPENSHIFT_MARIADB_DIR/conf/my.cnf.erb $OPENSHIFT_MARIADB_DIR/conf/my.cnf.erb.hidden
+mv $OPENSHIFT_MARIADB_DIR/conf/my-init.cnf.erb $OPENSHIFT_MARIADB_DIR/conf/my.cnf-init.erb.hidden
 
