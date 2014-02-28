@@ -81,7 +81,8 @@ wsrep_node_address=<%= ENV['OPENSHIFT_GEAR_DNS'] %>:<%= ENV['OPENSHIFT_MARIADB_N
 wsrep_sst_receive_address=<%= ENV['OPENSHIFT_GEAR_DNS'] %>:<%= ENV['OPENSHIFT_MARIADB_DB_PROXY_PORT'] %>
 
 wsrep_sst_method=mysqldump
-wsrep_sst_auth=<%= ENV['OPENSHIFT_MARIADB_DB_USERNAME'] %>:<%= ENV['OPENSHIFT_MARIADB_DB_PASSWORD'] %>
+#wsrep_sst_auth=<%= ENV['OPENSHIFT_MARIADB_DB_USERNAME'] %>:<%= ENV['OPENSHIFT_MARIADB_DB_PASSWORD'] %>
+wsrep_sst_auth=admin:pass
 
 log-error=<%= ENV['OPENSHIFT_MARIADB_DB_LOG_DIR'] %>/galera_cluster.log
 
