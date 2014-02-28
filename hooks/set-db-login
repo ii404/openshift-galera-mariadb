@@ -1,0 +1,99 @@
+#!/bin/bash
+
+set -e
+
+#app_name=$1
+#namespace=$2
+#local_gear=$3
+
+# echo "$@" >> $OPENSHIFT_MARIADB_DIR/hook-log
+
+# Touch our variables so they are owned by our user
+if [ ! -f $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_DB_ARRAY ]; then
+	touch $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_DB_ARRAY
+fi
+
+# Touch these also - just in case
+if [ ! -f $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_DB_USERNAME ]; then
+	touch $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_DB_USERNAME
+fi
+
+if [ ! -f $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_DB_PASSWORD ]; then
+	touch $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_DB_PASSWORD
+fi
+
+if [ ! -f $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_DB_URL ]; then
+	touch $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_DB_URL
+fi
+
+
+
+echo ${@:4};
+for arg in ${@:4}; do
+	arg=$(echo "$arg" | tr -d "\n" | tr -d "'")
+	gear=$(echo "$arg" | cut -f 1 -d '=')
+	addr=$(echo "$arg" | cut -f 3 -d '=')
+
+	# addr will have a format like this: 
+	# admin:pass
+
+# if INIT_DB status is 0
+if fgrep -q "0" $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_INIT_DB
+then
+
+	# Build our array of user:passwords
+	login_array=( `cat $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_DB_ARRAY` )
+
+	# check if exists
+	if fgrep -q "$addr" $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_DB_ARRAY
+	then
+		# Remove the address from the array
+		# node_gears=( "${node_gears[@]/$node}" )
+		echo 'Doing nothing...'
+	else
+		# Append to array of gears
+		login_array+=($addr)
+	fi
+
+	# Save our results
+	echo ${login_array[@]} > $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_DB_ARRAY
+
+	# Check we meet the minimum quorum size
+	if [ ${#login_array[@]} == 3 ]
+	then
+
+		# Set master_account to an excedingly high value
+		master_account=9999999999999999999999999999999zzzzzzzzzzzzzzzzzzzzzzz
+		# Determine master_account with simple comparrision
+		for t in "${login_array[@]}"
+		do 
+			if [ $t \< $login_array ]
+			then
+			    	login_array=$t
+			fi
+		done
+
+		echo "1" > $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_INIT_DB
+		login_array=(${login//:/ })
+
+		echo $login_array[0] > $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_DB_USERNAME
+		echo $login_array[1] > $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_DB_PASSWORD
+		echo "mysql://$login_array[0]:$login_array[1]@$OPENSHIFT_MARIADB_DB_HOST:$OPENSHIFT_MARIADB_DB_PORT/" > $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_DB_URL
+
+	fi
+else
+	# Split the addr string into an array
+	login_array=(${login//:/ })
+
+	# Result:
+	# ${login_array[0]} - USERNAME
+	# ${login_array[0]} - PASSWORD
+
+	echo $login_array[0] > $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_DB_USERNAME
+	echo $login_array[1] > $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_DB_PASSWORD
+	echo "mysql://$login_array[0]:$login_array[1]@$OPENSHIFT_MARIADB_DB_HOST:$OPENSHIFT_MARIADB_DB_PORT/" > $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_DB_URL
+
+fi
+
+
+
