@@ -6,3 +6,18 @@ case "$1" in
   -v|--version)
     version="$2"
 esac
+
+# Generate username, password, and db name and create env variables
+echo 'Generating username and password'
+
+username=$(generate_username)
+password=$(generate_password)
+
+echo "$username:$password" > $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_DB_TEMP
+
+echo 'Bootstrap MariaDB'
+# Setup the my-cnf init file
+oo-erb $OPENSHIFT_MARIADB_DIR/conf/my-init.cnf.erb.hidden > $OPENSHIFT_MARIADB_DIR/conf/my.cnf
+
+# Initialize the MariaDB databases - basedir is IMPORTANT!
+$OPENSHIFT_MARIADB_DIR/binaries/mariadb/scripts/mysql_install_db --defaults-file=$OPENSHIFT_MARIADB_DIR/conf/my.cnf --basedir=$OPENSHIFT_MARIADB_DIR/binaries/mariadb/ --datadir=$OPENSHIFT_MARIADB_DIR/data || error 'Failed to create mariadb database', 119

@@ -49,24 +49,26 @@ Cart-Data:
   Type: environment
   Description: "Unique ID which identified the gear. This value changes between gears."
   
-Suggests:
-- phpmyadmin-4
 Provides:
 - mariadb-5.5
 - MariaDB-Galera-server
 - MariaDB-client
 Publishes:
-  publish-mariadb-node:
-    Type: NET_TCP:mariadb-cluster
   publish-db-init:
     Type: NET_TCP:db-init
+  publish-db-login:
+    Type: NET_TCP:db-login
+  publish-mariadb-node:
+    Type: NET_TCP:mariadb-cluster
   publish-db-connection-info:
     Type: ENV:NET_TCP:db:connection-info
 Subscribes:
-  set-mariadb-node:
-    Type: NET_TCP:mariadb-cluster
   set-db-init:
     Type: NET_TCP:db-init
+  set-db-login:
+    Type: NET_TCP:db-login
+  set-mariadb-node:
+    Type: NET_TCP:mariadb-cluster
 Scaling:
   Min: 3
   Max: -1

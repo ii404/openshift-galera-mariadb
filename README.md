@@ -10,9 +10,10 @@ This should actually be very easy, assuming the node has access to the correct p
 
 **What's Different:**
 - MariaDB Galera cluster requires 2 extra ports (galera - 4567 and sst (state snapshot transfer) 4444) these are handled by hooks to save them as env variables to be shared across the cluster.
-- There are three ENV variables I've used to record a list of active servers. It is essentially a bunch of dirty bash scripts to that will manipulate and store the ENV variables from the publish and subscribe services of openshift cartridge.
+- There are three ENV variables I've used to record a list of active servers. It is essentially a bunch of bash scripts to that will manipulate and store the ENV variables from the publish and subscribe services of openshift cartridge.
 
 - Modification to the start command, it first will do a quick check to find all the hosts which are online and dynamically update the wsrep_cluster_addresses on boot
+- Modified wsrep_sst_mysqldump
 
 **To Do:**
 - Verify logic to prevent racing on cluster resume

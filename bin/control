@@ -29,63 +29,17 @@ function is_running {
 function init_db {
 
 	# Hooks should be doing all the checks, but we'll do one last test.
-	if fgrep -q "0" $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_INIT_DB
+	if fgrep -q "1" $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_INIT_DB
 	then
 
 	## 
 	#
 	# Starting the galera cluster is a three step process:
-	#   1. Start first node and use mysql_install_db
+	#   1. Start all the nodes and provision their initial database and login details
 	#   2. Restart the first node to initiate the galera cluster
 	#   3. Join the other hosts to the cluster
 	#
 	##
-
-	# Generate username, password, and db name and create env variables
-	echo 'Generating username and password'
-
-#	username=$(generate_username)
-#	password=$(generate_password)
-
-# Temporary User/Pass while I test mysqldump
-# later on add logic to setup an ENV variable version
-username='admin'
-password='pass'
-
-	echo "$username" > $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_DB_USERNAME
-	echo "$password" > $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_DB_PASSWORD
-	echo "mysql://$username:$password@$OPENSHIFT_MARIADB_DB_HOST:$OPENSHIFT_MARIADB_DB_PORT/" > $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_DB_URL
-
-	#backward comat to mysql
-	echo "$username" > $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MYSQL_DB_USERNAME
-	echo "$password" > $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MYSQL_DB_PASSWORD
-	echo "mysql://$username:$password@$OPENSHIFT_MARIADB_DB_HOST:$OPENSHIFT_MARIADB_DB_PORT/" > $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MYSQL_DB_URL
-
-	echo 'Bootstrap MariaDB'
-
-	# Setup the my-cnf init file
-	oo-erb $OPENSHIFT_MARIADB_DIR/conf/my-init.cnf.erb.hidden > $OPENSHIFT_MARIADB_DIR/conf/my.cnf
-
-	# Initialize the MariaDB databases - basedir is IMPORTANT!
-	$OPENSHIFT_MARIADB_DIR/binaries/mariadb/scripts/mysql_install_db --defaults-file=$OPENSHIFT_MARIADB_DIR/conf/my.cnf --basedir=$OPENSHIFT_MARIADB_DIR/binaries/mariadb/ --datadir=$OPENSHIFT_MARIADB_DIR/data --user=$USER || error 'Failed to create mariadb database', 119
-
-	client_result ""
-	client_result "MariaDB Galera Cluster ${OPENSHIFT_MARIADB_VERSION} database added.  Please make note of these credentials:"
-	client_result ""
-	client_result "       Root User: $username"
-	client_result "   Root Password: $password"
-	client_result "   Database Name: $OPENSHIFT_APP_NAME"
-	client_result ""
-
-	client_result "Connection URL: mysql://$OPENSHIFT_MARIADB_DB_HOST:$OPENSHIFT_MARIADB_DB_PORT/"
-	client_result ""
-	client_result "You can manage your new MariaDB database by also embedding phpmyadmin."
-	client_result "The phpmyadmin username and password will be the same as the MariaDB credentials above."
-
-	cart_props "connection_url=mysql://$OPENSHIFT_MARIADB_DB_HOST:$OPENSHIFT_MARIADB_DB_PORT/"
-	cart_props "username=$username"
-	cart_props "password=$password"
-	cart_props "database_name=$OPENSHIFT_APP_NAME"
 
 	dbname=$OPENSHIFT_APP_NAME
 	socket_file=$OPENSHIFT_MARIADB_DB_SOCKET
@@ -105,10 +59,6 @@ password='pass'
 	echo "drop database test;
 	create database \`${dbname}\` DEFAULT CHARACTER SET utf8 DEFAULT COLLATE utf8_general_ci;" | ./bin/mysql -u root -S ${socket_file} > /dev/null || error 'Failed to create database' 188
 
-
-username='admin'
-password='pass'
-
 	# Delete the test user and create our admin user from the generated_username and generated_password
 	echo "                                  
 	delete from user;
@@ -116,7 +66,7 @@ password='pass'
 	flush privileges;" | ./bin/mysql -u root -S ${socket_file} mysql > /dev/null || error "Failed to setup initial root user" 187
 
 	# DB-INIT Complete
-	echo "1" > $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_INIT_DB
+	echo "2" > $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_INIT_DB
 
 	# Check init_db
 	fi
@@ -129,7 +79,7 @@ password='pass'
 function start {
 
 # Hooks should be doing all the checks, but we'll do one last test.
-if fgrep -q "1" $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_INIT_DB
+if fgrep -q "2" $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_INIT_DB
 then
   if ! is_running; then
     echo "Starting MariaDB cartridge"
@@ -363,22 +313,11 @@ function cleanup_dump {
   rm -f $OPENSHIFT_DATA_DIR/mariadb_db_dbname
 }
 
-function rsync_checks {
-    rsync_pid=$(ps aux | grep "rsync" | grep -v grep | awk '{print $2}')
-    if [ ! -z $rsync_pid ]; then
-        echo "rsync daemon is still running, probably because mysql was not shutdown nicely, killing $rsync_pid ..."
-        kill -9 $rsync_pid
-        while kill -0 $rsync_pid; do echo '.'; done
-        echo "rsync daemon killed succesfully"
-    fi
-}
-
 case "$1" in
   init-db)
     init_db
   ;;
   start)
-    rsync_checks
     start
   ;;
   stop)

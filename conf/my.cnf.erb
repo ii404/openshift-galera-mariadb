@@ -60,33 +60,34 @@ interactive-timeout
 
 
 [mariadb]
+# Full Options:
 # http://www.codership.com/wiki/doku.php?id=mysql_options
+#
+# wsrep_cluster_name - this causes strange issues, just let galera choose the default name instead
+#
 wsrep_provider=<%= ENV['OPENSHIFT_MARIADB_DIR'] %>/binaries/galera/usr/lib64/galera/libgalera_smm.so
-
-# Don't use, causes issues
-#wsrep_cluster_name=<%= ENV['OPENSHIFT_APP_NAME'] %>
-
 wsrep_node_name=<%= ENV['OPENSHIFT_GEAR_DNS'] %>
 
 # Selinux won't let us bind to 0.0.0.0, so specify the loopback address
 # See http://www.codership.com/wiki/doku.php?id=galera_parameters
 # Testing: pc.wait_prim=no
-wsrep_provider_options="gmcast.listen_addr=tcp://<%= ENV['OPENSHIFT_MARIADB_DB_HOST'] %>:<%= ENV['OPENSHIFT_MARIADB_GALERA_PORT_1'] %>"
-# ;pc.wait_prim=no"
-#wsrep_provider_options="ist.recv_addr=<ec2_private_ipv4>" 
+wsrep_provider_options="gmcast.listen_addr=tcp://<%= ENV['OPENSHIFT_MARIADB_DB_HOST'] %>:<%= ENV['OPENSHIFT_MARIADB_GALERA_PORT_1'] %>;pc.wait_prim=no"
 
-# Define the default port (to listen on)
+# Define the galera port (that we're exposing through OpenShift)
 wsrep_node_address=<%= ENV['OPENSHIFT_GEAR_DNS'] %>:<%= ENV['OPENSHIFT_MARIADB_NODE_GALERA_PORT_1'] %>
 
-# IMPORTANT - using patched wsrep_sst_mysqldump we grab the public MYSQL port here - IMPORTANT
+# wsrep_sst_method - mysqldump or rsync
+wsrep_sst_method=mysqldump
+
+# Define the login details for mysqldump (not used with rsync)
+wsrep_sst_auth=<%= ENV['OPENSHIFT_MARIADB_DB_USERNAME'] %>:<%= ENV['OPENSHIFT_MARIADB_DB_PASSWORD'] %>
+
+# Define the SST Proxy Port (that we're exposing through OpenShift)
+# MARIADB_PROXY_PORT - mysqldump
+# MARIADB_NODE_GALERA_PORT_2 - rsync
 wsrep_sst_receive_address=<%= ENV['OPENSHIFT_GEAR_DNS'] %>:<%= ENV['OPENSHIFT_MARIADB_DB_PROXY_PORT'] %>
 
-wsrep_sst_method=mysqldump
-#wsrep_sst_auth=<%= ENV['OPENSHIFT_MARIADB_DB_USERNAME'] %>:<%= ENV['OPENSHIFT_MARIADB_DB_PASSWORD'] %>
-wsrep_sst_auth=admin:pass
-
 log-error=<%= ENV['OPENSHIFT_MARIADB_DB_LOG_DIR'] %>/galera_cluster.log
-
 
 # Should Add this:
 # Command to call when node status or cluster membership changes.

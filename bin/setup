@@ -10,7 +10,7 @@ esac
 # Create our data directories
 mkdir -p $OPENSHIFT_MARIADB_DIR/{log,pid,socket,data,run}
 
-# Move cnf files
+# Move cnf files so they don't get automatically processed on boot
 mv $OPENSHIFT_MARIADB_DIR/conf/my.cnf.erb $OPENSHIFT_MARIADB_DIR/conf/my.cnf.erb.hidden
 mv $OPENSHIFT_MARIADB_DIR/conf/my-init.cnf.erb $OPENSHIFT_MARIADB_DIR/conf/my-init.cnf.erb.hidden
 

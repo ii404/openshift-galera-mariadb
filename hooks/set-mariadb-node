@@ -24,10 +24,6 @@ if [ ! -f $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_SST_GEARS ]; then
 	touch $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_SST_GEARS
 fi
 
-if [ ! -f $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_INIT_DB ]; then
-	touch $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_INIT_DB
-	echo 0 > $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_INIT_DB
-fi
 
 echo ${@:4};
 for arg in ${@:4}; do
@@ -62,7 +58,7 @@ for arg in ${@:4}; do
 	if fgrep -q "${node}" $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_NODE_GEARS
 	then
 		# Remove the address from the array
-#		node_gears=( "${node_gears[@]/$node}" )
+		# node_gears=( "${node_gears[@]/$node}" )
 		echo 'Doing nothing...'
 	else
 		# Append to array of gears
@@ -83,7 +79,7 @@ for arg in ${@:4}; do
 	if fgrep -q "${galera}" $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_GALERA_GEARS
 	then
 		# Remove the address from the array
-#		galera_gears=( "${galera_gears[@]/$galera}" )
+		# galera_gears=( "${galera_gears[@]/$galera}" )
 		echo 'Doing nothing...'
 
 	else
@@ -105,7 +101,7 @@ for arg in ${@:4}; do
 	if fgrep -q "${sst}" $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_SST_GEARS
 	then
 		# Remove the address from the array
-#		sst_gears=( "${sst_gears[@]/$sst}" )
+		# sst_gears=( "${sst_gears[@]/$sst}" )
 		echo 'Doing nothing...'
 	else
 		# Append to array of gears
