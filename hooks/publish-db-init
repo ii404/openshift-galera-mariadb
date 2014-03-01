@@ -9,3 +9,5 @@ fi
 
 # Tell everyone the status of INIT-DB
 echo "OPENSHIFT_MARIADB_INIT_DB=`cat $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_INIT_DB`"
+
+echo "We ran publish-db-init at `date`" >> $OPENSHIFT_MARIADB_DIR/log/hook.log

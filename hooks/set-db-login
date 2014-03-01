@@ -103,3 +103,5 @@ else
 fi
 
 done
+
+echo "We ran set-db-login at `date`" >> $OPENSHIFT_MARIADB_DIR/log/hook.log

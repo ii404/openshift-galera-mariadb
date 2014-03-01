@@ -169,3 +169,5 @@ then
 	fi
 fi
 
+echo "We ran set mariadb-node at `date`" >> $OPENSHIFT_MARIADB_DIR/log/hook.log
+

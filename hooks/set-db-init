@@ -25,3 +25,5 @@ then
 fi
 
 done
+
+echo "We ran set-db-init at `date`" >> $OPENSHIFT_MARIADB_DIR/log/hook.log
