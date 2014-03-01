@@ -70,7 +70,7 @@ then
 	then
 
 		# Set master_account to an excedingly high value
-		master_account=9999999999999999999999999999999zzzzzzzzzzzzzzzzzzzzzzz
+		master_account=admin9999999999999999999999:pass99999999999999999999999
 		# Determine master_account with simple comparrision
 		for t in "${login_array[@]}"
 		do 

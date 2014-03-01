@@ -1,13 +1,6 @@
 #!/bin/bash
 
-# Touch our variables so they are owned by our user
-if [ ! -f $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_INIT_DB ]; then
-	touch $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_INIT_DB
-	# 0 - not initialized, 1 - globgal password defined, 2, initialized
-	echo 0 > $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_INIT_DB
-fi
-
-if [ fgrep -q "0" $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_INIT_DB ] && [ -f $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_DB_TEMP ]
+if [ -n "`grep '0' $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_INIT_DB`" ] && [ -f $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_DB_TEMP ]
 then
 	# If above are met, we're uninitialized
 	# Broadcast our generated login details
