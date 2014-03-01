@@ -90,7 +90,9 @@ then
 	echo "We just saved ${login_array[0]} and ${login_array[1]} as USERNAME" >> $OPENSHIFT_MARIADB_DIR/log/hook.log
 
 	fi
+
 elif fgrep -q "1" $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_INIT_DB
+then
 	# Split the addr string into an array
 	login_array=(${login//:/ })
 
