@@ -45,7 +45,7 @@ for arg in ${@:4}; do
 	# admin:pass
 
 	# If empty ignore
-	if [[ -z "$addr" ]]
+	if [ $addr = 0 ]
 		exit 0
 	fi
 
