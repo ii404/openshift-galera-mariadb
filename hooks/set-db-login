@@ -69,12 +69,12 @@ then
 		do 
 			if [ $t \< $login_array ]
 			then
-			    	login_array=$t
+			    	master_account=$t
 			fi
 		done
 
 		echo "1" > $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_INIT_DB
-		login_array=(${login//:/ })
+		login_array=(${master_account//:/ })
 
 		echo $login_array[0] > $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_DB_USERNAME
 		echo $login_array[1] > $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_DB_PASSWORD
