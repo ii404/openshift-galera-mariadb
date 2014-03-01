@@ -52,6 +52,7 @@ for arg in ${@:4}; do
 	
 	# We only need to build the array if we're db-init=0
 	if fgrep -q "0" $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_INIT_DB
+	then
 
 		# Build our array of user:passwords
 		login_array=( `cat $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_DB_ARRAY` )
