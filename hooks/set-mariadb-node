@@ -116,8 +116,8 @@ done
 # Configure DB_INIT
 ##
 
-# Check if DB has been initialized (1 = true, 0 = false)
-if fgrep -q "0" $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_INIT_DB
+# Check if DB is ready for init, 0=notready, 1=ready, 2=new_gear, 3=initialized
+if fgrep -q "1" $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_INIT_DB
 then
 	# Check if the database has been initialized
 	total_hosts=( `cat $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_NODE_GEARS` )
@@ -139,6 +139,7 @@ then
 
 		if [ "$OPENSHIFT_GEAR_DNS:$OPENSHIFT_MARIADB_DB_PROXY_PORT" == $master_gear ]
 		then
+			echo "2" > $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_INIT_DB
 			$OPENSHIFT_MARIADB_DIR/bin/control init-db
 
 			# Give it some time to settle
@@ -155,6 +156,7 @@ then
 				echo "quit" | telnet $(echo $master_gear | tr ":" "\n") | grep Connected > /dev/null 2>&1
 					if [ "$?" -ne "1" ]; #Ok
 					then
+						echo "2" > $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_INIT_DB
 						$OPENSHIFT_MARIADB_DIR/bin/control init-db
 						
 						# Give it some time to settle
@@ -167,7 +169,13 @@ then
 			
 		fi
 	fi
+# Joining a new gear to the cluster
+elif fgrep -q "2" $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_INIT_DB
+	$OPENSHIFT_MARIADB_DIR/bin/control init-db
+			
+	# Give it some time to settle
+	sleep 5
+	# Restart the gears to join the cluster
+	$OPENSHIFT_MARIADB_DIR/bin/control restart
 fi
-
-echo "We ran set mariadb-node at `date`" >> $OPENSHIFT_MARIADB_DIR/log/hook.log
 

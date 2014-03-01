@@ -29,7 +29,7 @@ function is_running {
 function init_db {
 
 	# Hooks should be doing all the checks, but we'll do one last test.
-	if fgrep -q "1" $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_INIT_DB
+	if fgrep -q "2" $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_INIT_DB
 	then
 
 	## 
@@ -66,7 +66,7 @@ function init_db {
 	flush privileges;" | ./bin/mysql -u root -S ${socket_file} mysql > /dev/null || error "Failed to setup initial root user" 187
 
 	# DB-INIT Complete
-	echo "2" > $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_INIT_DB
+	echo "3" > $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_INIT_DB
 
 	# Check init_db
 	fi
@@ -79,7 +79,7 @@ function init_db {
 function start {
 
 # Hooks should be doing all the checks, but we'll do one last test.
-if fgrep -q "2" $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_INIT_DB
+if fgrep -q "3" $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_INIT_DB
 then
   if ! is_running; then
     echo "Starting MariaDB cartridge"

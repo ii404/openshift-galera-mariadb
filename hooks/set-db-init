@@ -17,13 +17,11 @@ for arg in ${@:4}; do
 	# addr will have a format like this: 
 	# 0 or 1
 
-# Only accept the broadcast if passwords are set or cluster intialized already
-# Set passwords to initialized, but don't downgrade from initialized cluster
-if [ $addr = 1 ] || [ $addr = 2 ] && [ `cat $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_INIT_DB` = 0 ]
+# Only accept the broadcast if passwords are set or cluster intialized already (ie db-init=2 or 3)
+if [ $addr = 2 ] || [ $addr = 3 ] && [ `cat $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_INIT_DB` = 0 ]
 then
-	echo "1" > $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_INIT_DB
+	# Set passwords to initialized, we upgrade but never downgrade the db-init
+	echo "2" > $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_INIT_DB
 fi
 
 done
-
-echo "We ran set-db-init at `date`" >> $OPENSHIFT_MARIADB_DIR/log/hook.log

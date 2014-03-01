@@ -3,8 +3,9 @@
 **DB-INIT** 
 DB-INIT has three possible values:
 0 - uninitialized aka brand new gear
-1 - the passwords are sync'd throughout the cluster. It should really only sit in this state until the 3rd gear comes up
-2 - cluster is initialized
+1 - the passwords are sync'd throughout the cluster. Only the first 3 gears will enter this state
+2 - new gear waiting for passwords OR gear that still is waiting to be initialized
+3 - cluster is initialized
 
 Dot Point Logic:
 - **Publish:** Every new gear, start as db-init=0
@@ -44,3 +45,9 @@ Dot Point Logic:
 - > All gears will then run through and setup initial database and logind etails from DB-LOGIN
 - > Whichever gear has the lowest value will get a head start to start the cluster
 - > The other two gears will wait for the first one to complete, before joining the cluster
+
+**Example Scenarios:**
+- 3 gears started per manifest's min3. 
+> All 3 start with db-init=0, once the third one as executed it's publish all three will see 3 passwords in their array list
+- Extra 2 gears added to the cluster
+> Both gears will receive db-init=2 as soon as they join, this will skip the init process and just sync the passwords.

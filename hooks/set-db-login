@@ -67,28 +67,30 @@ for arg in ${@:4}; do
 	# Save our results
 	echo ${login_array[@]} > $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_DB_ARRAY
 
+
+	# This should only be running if this is a new gear joining the cluster
+	# 2 = waiting for password
+	if fgrep -q "2" $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_INIT_DB
+	then
+
+		# Split the addr string into an array - we should be safe to grab the last addr submitted to us
+		login_array=(${addr//:/ })
+
+		# Result:
+		# ${login_array[0]} - USERNAME
+		# ${login_array[0]} - PASSWORD
+
+		echo ${login_array[0]} > $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_DB_USERNAME
+		echo ${login_array[1]} > $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_DB_PASSWORD
+		echo "mysql://${login_array[0]}:${login_array[1]}@$OPENSHIFT_MARIADB_DB_HOST:$OPENSHIFT_MARIADB_DB_PORT/" > $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_DB_URL
+
+	fi
+
+
 done
 
-# This should only be running if this is a new gear joining the cluster
-# 1 = passwords sync'd
-if fgrep -q "1" $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_INIT_DB
-then
-
-	# Split the addr string into an array - we should be safe to grab the last addr submitted to us
-	login_array=(${addr//:/ })
-
-	# Result:
-	# ${login_array[0]} - USERNAME
-	# ${login_array[0]} - PASSWORD
-
-	echo ${login_array[0]} > $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_DB_USERNAME
-	echo ${login_array[1]} > $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_DB_PASSWORD
-	echo "mysql://${login_array[0]}:${login_array[1]}@$OPENSHIFT_MARIADB_DB_HOST:$OPENSHIFT_MARIADB_DB_PORT/" > $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_DB_URL
-
-	echo "round 2 in db-login We just saved ${login_array[0]} and ${login_array[1]} as USERNAME" >> $OPENSHIFT_MARIADB_DIR/log/hook.log
-
-# if INIT_DB status is 0
-elif fgrep -q "0" $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_INIT_DB
+# if INIT_DB status is 0 - only the first 3 gears will be INI_DB=0 because db-init hook is run first
+if fgrep -q "0" $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_INIT_DB
 then
 
 	# Check we meet the minimum quorum size
@@ -113,9 +115,5 @@ then
 		echo ${login_array[1]} > $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_DB_PASSWORD
 		echo "mysql://${login_array[0]}:${login_array[1]}@$OPENSHIFT_MARIADB_DB_HOST:$OPENSHIFT_MARIADB_DB_PORT/" > $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_DB_URL
 
-	echo "We just saved ${login_array[0]} and ${login_array[1]} as USERNAME" >> $OPENSHIFT_MARIADB_DIR/log/hook.log
-
 	fi
 fi
-
-echo "We ran set-db-login at `date`" >> $OPENSHIFT_MARIADB_DIR/log/hook.log
