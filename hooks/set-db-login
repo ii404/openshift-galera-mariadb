@@ -46,6 +46,7 @@ for arg in ${@:4}; do
 
 	# If empty ignore
 	if [ $addr = 0 ]
+	then
 		exit 0
 	fi
 
