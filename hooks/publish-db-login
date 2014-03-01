@@ -6,9 +6,12 @@ then
 	# Broadcast our generated login details
 	echo "OPENSHIFT_MARIADB_DB_LOGIN=`cat $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_DB_TEMP`"
 
+echo "first echo was met.."  >> $OPENSHIFT_MARIADB_DIR/log/hook.log
+
 # We may already be initialized but not have the correct password, so lets do a check before aimlessly broadcasting
 elif [ -s $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_DB_USERNAME ] || [ -s $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_DB_PASSWORD ]; then
 		echo "OPENSHIFT_MARIADB_DB_LOGIN=`cat $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_DB_USERNAME`:`cat $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_DB_PASSWORD`"
+echo "second echo was met.."  >> $OPENSHIFT_MARIADB_DIR/log/hook.log
 fi
 
 echo "We ran publish-db-login at `date`" >> $OPENSHIFT_MARIADB_DIR/log/hook.log
