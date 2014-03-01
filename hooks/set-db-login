@@ -47,28 +47,8 @@ for arg in ${@:4}; do
 	# If empty ignore
 	if [ $addr = 0 ]
 	then
-		exit 0
+		break
 	fi
-
-if fgrep -q "1" $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_INIT_DB
-then
-
-	# Split the addr string into an array
-	login_array=(${addr//:/ })
-
-	# Result:
-	# ${login_array[0]} - USERNAME
-	# ${login_array[0]} - PASSWORD
-
-	echo ${login_array[0]} > $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_DB_USERNAME
-	echo ${login_array[1]} > $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_DB_PASSWORD
-	echo "mysql://${login_array[0]}:${login_array[1]}@$OPENSHIFT_MARIADB_DB_HOST:$OPENSHIFT_MARIADB_DB_PORT/" > $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_DB_URL
-
-	echo "round 2 in db-login We just saved ${login_array[0]} and ${login_array[1]} as USERNAME" >> $OPENSHIFT_MARIADB_DIR/log/hook.log
-
-# if INIT_DB status is 0
-elif fgrep -q "0" $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_INIT_DB
-then
 
 	# Build our array of user:passwords
 	login_array=( `cat $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_DB_ARRAY` )
@@ -87,12 +67,36 @@ then
 	# Save our results
 	echo ${login_array[@]} > $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_DB_ARRAY
 
+done
+
+# This should only be running if this is a new gear joining the cluster
+# 1 = passwords sync'd
+if fgrep -q "1" $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_INIT_DB
+then
+
+	# Split the addr string into an array - we should be safe to grab the last addr submitted to us
+	login_array=(${addr//:/ })
+
+	# Result:
+	# ${login_array[0]} - USERNAME
+	# ${login_array[0]} - PASSWORD
+
+	echo ${login_array[0]} > $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_DB_USERNAME
+	echo ${login_array[1]} > $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_DB_PASSWORD
+	echo "mysql://${login_array[0]}:${login_array[1]}@$OPENSHIFT_MARIADB_DB_HOST:$OPENSHIFT_MARIADB_DB_PORT/" > $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_DB_URL
+
+	echo "round 2 in db-login We just saved ${login_array[0]} and ${login_array[1]} as USERNAME" >> $OPENSHIFT_MARIADB_DIR/log/hook.log
+
+# if INIT_DB status is 0
+elif fgrep -q "0" $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_INIT_DB
+then
+
 	# Check we meet the minimum quorum size
 	if [ ${#login_array[@]} == 3 ]
 	then
 
 		# Set master_account to an excedingly high value
-		master_account=admin9999999999999999999999:pass99999999999999999999999
+		master_account=adminzzzz99999:passzzzz99999
 		# Determine master_account with simple comparrision
 		for t in "${login_array[@]}"
 		do 
@@ -113,7 +117,5 @@ then
 
 	fi
 fi
-
-done
 
 echo "We ran set-db-login at `date`" >> $OPENSHIFT_MARIADB_DIR/log/hook.log
