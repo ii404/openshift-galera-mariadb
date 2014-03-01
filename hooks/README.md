@@ -9,10 +9,10 @@ DB-INIT has three possible values:
 
 Dot Point Logic:
 - **Publish:** Every new gear, start as db-init=0
-- > Now, lets tell everyone we're a noob (aka db-init=0)
+- > Now, lets tell everyone what our current db-init is (either 0,1,2,3)
 - **Subscribe:** For anyone listening, they'll only take note of the new value if they hear db-init>0
-- > If criteria match, we'll only upgrade our db-init to 1. 
-- > If we receive 2, but we are 0 we set ourself to 1, this means the rest of our cluster is already initialized but we still need to go through the steps.
+- > If criteria match, we'll only upgrade our db-init to 2
+- > If we receive 2/3, but we are 0 we set ourself to 2, this means the rest of our cluster is already initialized but we still need to go through the steps.
 
 **DB-LOGIN**
 DB-LOGIN has two functions:
@@ -22,13 +22,14 @@ DB-LOGIN has two functions:
 Dot Point Logic:
 - **Publish:** If we're uninitialized (ie. db-init=0) lets broadcast our random username and passwords we generated in the install script
 - **Publish:** Otherwise, we're already initialized so let's share our password around the cluster
+- **Publish:** Or, we're still waiting for passwords (ie. db-init=2) so we stay quiet
 
 - **Subscribe:** If we're uninitialized, every time a gear broadcasts their login details we grab it and build the values into an array and save it.
 - > Once we've hit got a minimum of 3 values, we do a dumb check to validate which has the lowest value. This check will end up with the same result accross all the gears. 
 - > We save the user:pass with the lowest value and state DB-INIT=1
 
-- **Subscribe:** However if we've got a state of initialized, this could mean we're either genuinely initialized OR just faking it
-- > Any new user:pass we receive should be sanitized so let's accept them.
+- **Subscribe:** However if we've got a state of db-init=2, this could mean we're still waiting for passwords
+- > Any new user:pass we receive should be sanitized so let's accept them all
 
 **MARIADB-NODE**
 MARIADB-NODE has two functions:

@@ -49,24 +49,27 @@ for arg in ${@:4}; do
 	then
 		break
 	fi
+	
+	# We only need to build the array if we're db-init=0
+	if fgrep -q "0" $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_INIT_DB
 
-	# Build our array of user:passwords
-	login_array=( `cat $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_DB_ARRAY` )
+		# Build our array of user:passwords
+		login_array=( `cat $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_DB_ARRAY` )
 
-	# check if exists
-	if fgrep -q "$addr" $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_DB_ARRAY
-	then
-		# Remove the address from the array
-		# node_gears=( "${node_gears[@]/$node}" )
-		echo 'Doing nothing...'
-	else
-		# Append to array of gears
-		login_array+=($addr)
+		# check if exists
+		if fgrep -q "$addr" $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_DB_ARRAY
+		then
+			# Remove the address from the array
+			# node_gears=( "${node_gears[@]/$node}" )
+			echo 'Doing nothing...'
+		else
+			# Append to array of gears
+			login_array+=($addr)
+		fi
+
+		# Save our results
+		echo ${login_array[@]} > $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_DB_ARRAY
 	fi
-
-	# Save our results
-	echo ${login_array[@]} > $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_DB_ARRAY
-
 
 	# This should only be running if this is a new gear joining the cluster
 	# 2 = waiting for password

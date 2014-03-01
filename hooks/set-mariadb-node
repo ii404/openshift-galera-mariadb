@@ -171,6 +171,7 @@ then
 	fi
 # Joining a new gear to the cluster
 elif fgrep -q "2" $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_INIT_DB
+then
 	$OPENSHIFT_MARIADB_DIR/bin/control init-db
 			
 	# Give it some time to settle
