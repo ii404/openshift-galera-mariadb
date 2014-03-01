@@ -105,6 +105,7 @@ then
 	echo "We just saved ${login_array[0]} and ${login_array[1]} as USERNAME" >> $OPENSHIFT_MARIADB_DIR/log/hook.log
 
 	fi
+fi
 
 done
 
