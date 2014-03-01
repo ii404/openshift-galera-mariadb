@@ -44,6 +44,10 @@ for arg in ${@:4}; do
 	# addr will have a format like this: 
 	# admin:pass
 
+echo "-------------------------" >> $OPENSHIFT_MARIADB_DIR/log/hook.log
+echo "We received $addr" >> $OPENSHIFT_MARIADB_DIR/log/hook.log
+echo "-------------------------" >> $OPENSHIFT_MARIADB_DIR/log/hook.log
+
 	# If empty ignore
 	if [ $addr = 0 ]
 	then
@@ -79,6 +83,13 @@ for arg in ${@:4}; do
 
 		# Split the addr string into an array - we should be safe to grab the last addr submitted to us
 		login_array=(${addr//:/ })
+
+echo "-------------------------" >> $OPENSHIFT_MARIADB_DIR/log/hook.log
+echo "login_array is:" >> $OPENSHIFT_MARIADB_DIR/log/hook.log
+echo ${login_array[0]} >> $OPENSHIFT_MARIADB_DIR/log/hook.log
+echo ${login_array[1]} >> $OPENSHIFT_MARIADB_DIR/log/hook.log
+echo "-------------------------" >> $OPENSHIFT_MARIADB_DIR/log/hook.log
+
 
 		# Result:
 		# ${login_array[0]} - USERNAME
