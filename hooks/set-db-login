@@ -44,8 +44,14 @@ for arg in ${@:4}; do
 	# addr will have a format like this: 
 	# admin:pass
 
+	# If empty ignore
+	if [[ -z "$addr" ]]
+		exit 0
+	fi
+
 if fgrep -q "1" $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_INIT_DB
 then
+
 	# Split the addr string into an array
 	login_array=(${addr//:/ })
 
