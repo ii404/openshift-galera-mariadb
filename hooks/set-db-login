@@ -87,6 +87,8 @@ then
 		echo ${login_array[1]} > $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_DB_PASSWORD
 		echo "mysql://${login_array[0]}:${login_array[1]}@$OPENSHIFT_MARIADB_DB_HOST:$OPENSHIFT_MARIADB_DB_PORT/" > $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_DB_URL
 
+	echo "We just saved ${login_array[0]} and ${login_array[1]} as USERNAME" >> $OPENSHIFT_MARIADB_DIR/log/hook.log
+
 	fi
 else
 	# Split the addr string into an array
@@ -99,6 +101,8 @@ else
 	echo ${login_array[0]} > $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_DB_USERNAME
 	echo ${login_array[1]} > $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_DB_PASSWORD
 	echo "mysql://${login_array[0]}:${login_array[1]}@$OPENSHIFT_MARIADB_DB_HOST:$OPENSHIFT_MARIADB_DB_PORT/" > $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_DB_URL
+
+	echo "round 2 in db-login We just saved ${login_array[0]} and ${login_array[1]} as USERNAME" >> $OPENSHIFT_MARIADB_DIR/log/hook.log
 
 fi
 
