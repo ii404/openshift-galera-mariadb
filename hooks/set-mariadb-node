@@ -163,6 +163,7 @@ then
 						sleep 5
 						# Restart the gears to join the cluster
 						$OPENSHIFT_MARIADB_DIR/bin/control restart
+
 						break
 					fi
 			done
