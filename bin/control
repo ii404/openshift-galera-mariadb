@@ -98,7 +98,7 @@ then
     done < $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_TEMP_ARRAY
 
 	# Loop through our newly sorted array
-	for i in ${sort_array[@]}; 
+	for i in ${sortarray[@]}; 
 	do 
 		# Ignore own host
 		if [ "$OPENSHIFT_GEAR_DNS:$OPENSHIFT_MARIADB_NODE_GALERA_PORT_1" == $i ] 
