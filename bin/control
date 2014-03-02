@@ -82,6 +82,8 @@ then
     echo "Starting MariaDB cartridge"
     oo-erb $OPENSHIFT_MARIADB_DIR/conf/my.cnf.erb.hidden > $OPENSHIFT_MARIADB_DIR/conf/my.cnf
     
+    active_gears=(`cat $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_GALERA_GEARS`)
+
     # Sort the array so everyone has a standard
     declare -a sortarray
     # Use a temp file 
@@ -125,7 +127,6 @@ then
 	sleep `shuf -i 5-20 -n 1`
 
     # Build up our array of online gears
-    active_gears=(`cat $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_GALERA_GEARS`)
     online_gears=''
     for i in ${active_gears[@]}; 
     do 
