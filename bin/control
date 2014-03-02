@@ -120,7 +120,7 @@ then
 		fi
 		
 		# Wait for our turn
-		sleep 10
+		sleep 15
 	done
 
     # Build up our array of online gears
