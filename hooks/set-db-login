@@ -49,7 +49,7 @@ echo "We received $addr" >> $OPENSHIFT_MARIADB_DIR/log/hook.log
 echo "-------------------------" >> $OPENSHIFT_MARIADB_DIR/log/hook.log
 
 	# If empty ignore
-	if [ $addr = 0 ]
+	if [ $addr = 0 ] || [ $addr = '' ] || [ $addr = ' ' ]
 	then
 		break
 	fi
