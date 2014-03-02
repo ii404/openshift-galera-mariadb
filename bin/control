@@ -86,7 +86,8 @@ then
     # Attempt to prevent race on cluster resume
     if [ -f $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_INDEX ]; then
     wait_timer=( `cat $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_INDEX` )
-    wait_timer=$[wait_timer*10]
+    rng=( `shuf -i 11-20 -n 1` )
+    wait_timer=$(($wait_timer * $rng))
 
     echo "We're sleeping for $wait_timer in an attempt to prevent racing"
     sleep $wait_timer
@@ -135,7 +136,7 @@ then
     wait_for_mysqld_availability
 
     # Store the wsrep_index (note this is dynamic)
-    echo "SHOW STATUS LIKE 'wsrep%';" | $OPENSHIFT_MARIADB_DIR/usr/mariadb/bin/mysql -u root -S $OPENSHIFT_MARIADB_DB_SOCKET -u $OPENSHIFT_MARIADB_DB_USERNAME -p$OPENSHIFT_MARIADB_DB_PASSWORD | grep wsrep_local_index | grep -o "[0-9]" > $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_INDEX
+    echo "SHOW STATUS LIKE 'wsrep%';" | $OPENSHIFT_MARIADB_DIR/usr/mariadb/bin/mysql -u root -S $OPENSHIFT_MARIADB_DB_SOCKET -u $OPENSHIFT_MARIADB_DB_USERNAME -p$OPENSHIFT_MARIADB_DB_PASSWORD | grep wsrep_local_index | grep -o "[0-9]"  | cut -c1-2 > $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_INDEX
 
 
   else
