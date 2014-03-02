@@ -84,6 +84,11 @@ echo "-------------------------" >> $OPENSHIFT_MARIADB_DIR/log/hook.log
 		# Split the addr string into an array - we should be safe to grab the last addr submitted to us
 		login_array=(${addr//:/ })
 
+		# Sometimes we receive blank broadcasts, so only accept them if they're not null
+		if [ ${#login_array[@]} == 1 ]
+		then
+
+
 echo "-------------------------" >> $OPENSHIFT_MARIADB_DIR/log/hook.log
 echo "login_array is:" >> $OPENSHIFT_MARIADB_DIR/log/hook.log
 echo ${login_array[0]} >> $OPENSHIFT_MARIADB_DIR/log/hook.log
@@ -91,13 +96,14 @@ echo ${login_array[1]} >> $OPENSHIFT_MARIADB_DIR/log/hook.log
 echo "-------------------------" >> $OPENSHIFT_MARIADB_DIR/log/hook.log
 
 
-		# Result:
-		# ${login_array[0]} - USERNAME
-		# ${login_array[0]} - PASSWORD
+			# Result:
+			# ${login_array[0]} - USERNAME
+			# ${login_array[0]} - PASSWORD
 
-		echo ${login_array[0]} > $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_DB_USERNAME
-		echo ${login_array[1]} > $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_DB_PASSWORD
-		echo "mysql://${login_array[0]}:${login_array[1]}@$OPENSHIFT_MARIADB_DB_HOST:$OPENSHIFT_MARIADB_DB_PORT/" > $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_DB_URL
+			echo ${login_array[0]} > $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_DB_USERNAME
+			echo ${login_array[1]} > $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_DB_PASSWORD
+			echo "mysql://${login_array[0]}:${login_array[1]}@$OPENSHIFT_MARIADB_DB_HOST:$OPENSHIFT_MARIADB_DB_PORT/" > $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_DB_URL
+		fi
 
 	fi
 
