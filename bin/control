@@ -89,6 +89,9 @@ then
     # In most cases, there will be a index=0 and that'll start first
     if [ -f $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_INDEX ]; then
     wait_timer=( `cat $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_INDEX` )
+
+    # Sometimes we may end up with two gears at 0
+    wait_timer=$(($wait_timer+1))
     rng1=( `shuf -i 5-7 -n 2` )
     rng2=( `shuf -i 5-7 -n 2` )
     wait_timer=$(($wait_timer * $rng1 * $rng2))
