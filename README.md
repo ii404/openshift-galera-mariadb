@@ -15,6 +15,7 @@ This is a WIP MariaDB Galera cartridge for OpenShift
 **To Do:**
 - Verify logic to prevent racing on cluster resume (when a gear idles or gets moved, or worst case all the gears get powered off)
 > if this does not get a proper fix, there is a rare case that the cluster with each gear being standalone. (ie. split brain)
+> **Untested Solution** using a wait timer on the cluster ID and a loop (see control start script)
 - Move binaries into versions to follow other cartridge hiearchy (done)
 - Make sure the ENV variables are properly sharing the variables (90% sure this is verified, but haven't tested all case scenarios)
 - Verify logic and possible loops or data corruption (I'd really appreciate a second pair of eyes)
