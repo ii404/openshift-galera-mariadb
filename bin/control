@@ -82,11 +82,6 @@ then
     echo "Starting MariaDB cartridge"
     oo-erb $OPENSHIFT_MARIADB_DIR/conf/my.cnf.erb.hidden > $OPENSHIFT_MARIADB_DIR/conf/my.cnf
     
-
-    # Quick check to see if other hosts are up
-    active_gears=(`cat $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_GALERA_GEARS`)
-    online_gears=''
-
     # Sort the array so everyone has a standard
     declare -a sortarray
     # Use a temp file 
@@ -107,6 +102,7 @@ then
 		if [ "$OPENSHIFT_GEAR_DNS:$OPENSHIFT_MARIADB_NODE_GALERA_PORT_1" == $i ] 
 		then
 			# We are matched
+			echo "We matched ourselves in the array"
 			break
 		fi
 		# test if other gears are accessible (nc not available)
@@ -116,6 +112,7 @@ then
 		echo "quit" | telnet $(echo $i | tr ":" "\n") | grep Connected > /dev/null 2>&1
 		if [ "$?" -ne "1" ]; #Ok
 		then
+			echo "Someone else is alive in the cluster"
 			# If anyone else is online, lets break from the loop
 			break
 		fi
@@ -128,8 +125,9 @@ then
 	sleep `shuf -i 5-20 -n 1`
 
     # Build up our array of online gears
+    active_gears=(`cat $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_GALERA_GEARS`)
     online_gears=''
-    for i in ${sort_array[@]}; 
+    for i in ${active_gears[@]}; 
     do 
 	# Ignore own host
 	if [ "$OPENSHIFT_GEAR_DNS:$OPENSHIFT_MARIADB_NODE_GALERA_PORT_1" == $i ] 
