@@ -84,37 +84,79 @@ then
     
 
     # Attempt to prevent race on cluster resume
+    # Doing a comparrison of lowest gears may not be ideal because of gears being removed
+    # Relying on consistency with hooks may also be more risky
+    # In most cases, there will be a index=0 and that'll start first
     if [ -f $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_INDEX ]; then
     wait_timer=( `cat $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_INDEX` )
-    rng=( `shuf -i 11-20 -n 1` )
-    wait_timer=$(($wait_timer * $rng))
+    rng1=( `shuf -i 5-7 -n 2` )
+    rng2=( `shuf -i 5-7 -n 2` )
+    wait_timer=$(($wait_timer * $rng1 * $rng2))
 
     echo "We're sleeping for $wait_timer in an attempt to prevent racing"
-    sleep $wait_timer
-    fi
 
     # Quick check to see if other hosts are up
     active_gears=(`cat $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_GALERA_GEARS`)
     online_gears=''
-    for i in ${active_gears[@]}; 
-    do 
-	# Ignore own host
-	if [ "$OPENSHIFT_GEAR_DNS:$OPENSHIFT_MARIADB_NODE_GALERA_PORT_1" == $i ] 
-	then
-		continue
-	fi
-	# test if other gears are accessible (nc not available)
-	# if nc -w 5 $(echo $i | tr ":" "\n") 2>/dev/null
 
-	# test if other gears are accessible
-	echo "quit" | telnet $(echo $i | tr ":" "\n") | grep Connected > /dev/null 2>&1
-	if [ "$?" -ne "1" ]; #Ok
-	then
-		online_gears="$online_gears,$i"
-	else
-		client_result "Warning: $i is not responding! The node which hosts this gear may be offline - ignore this message if you're just starting the cluster."
-	fi
-    done
+	for i in {1..$wait_timer}
+	do
+	    for i in ${active_gears[@]}; 
+	    do 
+		# Ignore own host
+		if [ "$OPENSHIFT_GEAR_DNS:$OPENSHIFT_MARIADB_NODE_GALERA_PORT_1" == $i ] 
+		then
+			continue
+		fi
+		# test if other gears are accessible (nc not available)
+		# if nc -w 5 $(echo $i | tr ":" "\n") 2>/dev/null
+
+		# test if other gears are accessible
+		echo "quit" | telnet $(echo $i | tr ":" "\n") | grep Connected > /dev/null 2>&1
+		if [ "$?" -ne "1" ]; #Ok
+		then
+			online_gears="$online_gears,$i"
+		else
+			client_result "Warning: $i is not responding! The node which hosts this gear may be offline - ignore this message if you're just starting the cluster."
+		fi
+	    done
+
+	    # Remove the leading , (if exists)
+	    online_gears=`echo $online_gears | sed 's/^,//'`
+	    # Generate the dynamic wsrep_cluster_addresses (none prints out as 1)
+	    if [ `echo $online_gears | sed 's/[^,]//g' | wc -c` -gt 2 ] && [[ -z "$online_gears" ]]; then
+		break
+	    fi
+
+            sleep 1
+	done
+
+    else
+	    # Quick check to see if other hosts are up
+	    active_gears=(`cat $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_GALERA_GEARS`)
+	    online_gears=''
+	    for i in ${active_gears[@]}; 
+	    do 
+		# Ignore own host
+		if [ "$OPENSHIFT_GEAR_DNS:$OPENSHIFT_MARIADB_NODE_GALERA_PORT_1" == $i ] 
+		then
+			continue
+		fi
+		# test if other gears are accessible (nc not available)
+		# if nc -w 5 $(echo $i | tr ":" "\n") 2>/dev/null
+
+		# test if other gears are accessible
+		echo "quit" | telnet $(echo $i | tr ":" "\n") | grep Connected > /dev/null 2>&1
+		if [ "$?" -ne "1" ]; #Ok
+		then
+			online_gears="$online_gears,$i"
+		else
+			client_result "Warning: $i is not responding! The node which hosts this gear may be offline - ignore this message if you're just starting the cluster."
+		fi
+	    done
+    fi
+
+
         
     # We MUST run mysqld_safe from this dir or else it will fail
     cd $OPENSHIFT_MARIADB_DIR/usr/mariadb
@@ -124,7 +166,6 @@ then
 
     # Generate the dynamic wsrep_cluster_addresses (none prints out as 1)
     if [ `echo $online_gears | sed 's/[^,]//g' | wc -c` -lt 2 ] && [[ -z "$online_gears" ]];
-
     then
     	echo 'Initial Startup (first host)'
         ./bin/mysqld_safe --defaults-file=$OPENSHIFT_MARIADB_DIR/conf/my.cnf --wsrep_cluster_address='gcomm://' > /dev/null 2>&1 &

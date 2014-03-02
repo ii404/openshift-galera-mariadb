@@ -25,3 +25,7 @@ This is a WIP MariaDB Galera cartridge for OpenShift
 - Create another embeded haproxy cartridge for loadbalancing (need more research)
 - Setup SSL for the mysqldump (need more research)
 - Add a wsrep_notify_cmd script
+
+**Feedback:**
+
+I appreciate any feedback and any code comments you have. If you see something absolutely horrible, please tell me so I can improve :)
