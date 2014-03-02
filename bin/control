@@ -180,6 +180,8 @@ then
 
     wait_for_mysqld_availability
 
+    # It needs to settle in
+    sleep 15
     # Store the wsrep_index (note this is dynamic)
     echo "SHOW STATUS LIKE 'wsrep%';" | $OPENSHIFT_MARIADB_DIR/usr/mariadb/bin/mysql -u root -S $OPENSHIFT_MARIADB_DB_SOCKET -u $OPENSHIFT_MARIADB_DB_USERNAME -p$OPENSHIFT_MARIADB_DB_PASSWORD | grep wsrep_local_index | grep -o "[0-9]"  | cut -c1-2 > $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_CLUSTER_INDEX
 
