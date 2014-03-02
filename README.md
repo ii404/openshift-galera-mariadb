@@ -14,10 +14,11 @@ This is a WIP MariaDB Galera cartridge for OpenShift
 **To Do:**
 - Verify logic to prevent racing on cluster resume
 - Move binaries into versions to follow other cartridge hiearchy
-- Make sure the ENV variables are properly sharing the variables
-- Verify logic and possible loops or data corruption
+- Make sure the ENV variables are properly sharing the variables (90% sure this is verified, but haven't tested all case scenarios)
+- Verify logic and possible loops or data corruption (I'd really appreciate a second pair of eyes)
 - Do the upgrade/snapshot/backup scripts
-- Test!
 
-- Setup proper version control so for nodes with the correct packages installed can get automatically updated
+**Ideally:**
+- Setup proper version control so for nodes with the correct packages installed can get automatically updates
 - Create another embeded haproxy cartridge for loadbalancing
+- Setup SSL for the mysqldump

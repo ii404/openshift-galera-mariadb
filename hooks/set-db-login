@@ -88,6 +88,7 @@ for arg in ${@:4}; do
 		temp=( `cat $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_DB_TEMP` )
 		temp_array=(${temp//:/ })
 		if [ ${login_array[0]} != ${temp_array[0]} ]
+		then
 
 			# Result:
 			# ${login_array[0]} - USERNAME
