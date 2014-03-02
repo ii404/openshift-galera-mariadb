@@ -44,10 +44,6 @@ for arg in ${@:4}; do
 	# addr will have a format like this: 
 	# admin:pass
 
-echo "-------------------------" >> $OPENSHIFT_MARIADB_DIR/log/hook.log
-echo "We received $addr" >> $OPENSHIFT_MARIADB_DIR/log/hook.log
-echo "-------------------------" >> $OPENSHIFT_MARIADB_DIR/log/hook.log
-
 	# If empty ignore
 	if [ $addr = 0 ] || [ $addr = '' ] || [ $addr = ' ' ]
 	then
@@ -85,7 +81,7 @@ echo "-------------------------" >> $OPENSHIFT_MARIADB_DIR/log/hook.log
 		login_array=(${addr//:/ })
 
 		# Sometimes we receive blank broadcasts, so only accept them if they're not null
-		if [ ${#login_array[@]} == 1 ]
+		if [ ${#login_array[@]} == 2 ]
 		then
 
 
