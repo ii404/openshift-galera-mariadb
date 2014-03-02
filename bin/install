@@ -20,4 +20,4 @@ echo 'Bootstrap MariaDB'
 oo-erb $OPENSHIFT_MARIADB_DIR/conf/my-init.cnf.erb.hidden > $OPENSHIFT_MARIADB_DIR/conf/my.cnf
 
 # Initialize the MariaDB databases - basedir is IMPORTANT!
-$OPENSHIFT_MARIADB_DIR/binaries/mariadb/scripts/mysql_install_db --defaults-file=$OPENSHIFT_MARIADB_DIR/conf/my.cnf --basedir=$OPENSHIFT_MARIADB_DIR/binaries/mariadb/ --datadir=$OPENSHIFT_MARIADB_DIR/data || error 'Failed to create mariadb database', 119
+$OPENSHIFT_MARIADB_DIR/usr/mariadb/scripts/mysql_install_db --defaults-file=$OPENSHIFT_MARIADB_DIR/conf/my.cnf --basedir=$OPENSHIFT_MARIADB_DIR/usr/mariadb/ --datadir=$OPENSHIFT_MARIADB_DIR/data || error 'Failed to create mariadb database', 119

@@ -18,8 +18,6 @@
 
 # This is a reference script for rsync-based state snapshot tansfer
 
-source $OPENSHIFT_CARTRIDGE_SDK_BASH
-
 RSYNC_PID=
 RSYNC_CONF=
 OS=$(uname)
@@ -197,25 +195,6 @@ then
         exit 114 # EALREADY
     fi
     rm -rf "$RSYNC_PID"
-
-## 
-# Modification to work with OpenShift
-##
-
-    ADDR=$OPENSHIFT_MARIADB_DB_HOST:$OPENSHIFT_MARIADB_GALERA_PORT_2 # listen on our loopback address
-    RSYNC_PORT=$OPENSHIFT_MARIADB_GALERA_PORT_2 # listen to our internal port
-
-echo "The JOINER will connect to $ADDR"
-
-#
-#    ADDR=$WSREP_SST_OPT_ADDR
-#    RSYNC_PORT=$(echo $ADDR | awk -F ':' '{ print $2 }')
-#    if [ -z "$RSYNC_PORT" ]
-#    then
-#        RSYNC_PORT=4444
-#        ADDR="$(echo $ADDR | awk -F ':' '{ print $1 }'):$RSYNC_PORT"
-#    fi
-#
 
     trap "exit 32" HUP PIPE
     trap "exit 3"  INT TERM ABRT

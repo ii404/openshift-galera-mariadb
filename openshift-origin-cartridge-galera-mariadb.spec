@@ -1,7 +1,7 @@
-%global cartridgedir %{_libexecdir}/openshift/cartridges/mariadb
+%global cartridgedir %{_libexecdir}/openshift/cartridges/galera-mariadb
 
-Summary:       Provides mariadb galera cluster support
-Name:          openshift-origin-cartridge-mariadb-galera
+Summary:       Provides galera mariadb cluster support
+Name:          openshift-origin-cartridge-galera-mariadb
 Version:       5.5
 Release:       1%{?dist}
 Group:         Network/Daemons
@@ -17,6 +17,7 @@ Requires:      MariaDB-Galera-server
 Requires:      MariaDB-client
 Requires:      MariaDB-compat
 Requires:      galera
+Requires:      telnet
 %endif
 
 Requires:      rubygem(openshift-origin-node)
@@ -47,9 +48,11 @@ Provides mariadb galera cluster cartridge support to OpenShift. (Cartridge Forma
 %doc %{cartridgedir}/LICENSE
 
 %changelog
+* Sun Mar 2 2014 Andrew Lau <andrew@andrewklau.com> 5.5
+- Added mariadb-galera support
+
 * Mon Jan 27 2014 Andrew Lau <andrew@andrewklau.com> 5.5
 - Added mariadb support for RHEL/EL with SCL
-- Added mariadb-galera support
 
 * Fri Sep 13 2013 Troy Dawson <tdawson@redhat.com> 1.15.1-1
 - Bump up version (tdawson@redhat.com)

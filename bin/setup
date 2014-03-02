@@ -14,3 +14,11 @@ mkdir -p $OPENSHIFT_MARIADB_DIR/{log,pid,socket,data,run}
 mv $OPENSHIFT_MARIADB_DIR/conf/my.cnf.erb $OPENSHIFT_MARIADB_DIR/conf/my.cnf.erb.hidden
 mv $OPENSHIFT_MARIADB_DIR/conf/my-init.cnf.erb $OPENSHIFT_MARIADB_DIR/conf/my-init.cnf.erb.hidden
 
+# Setup our binaries and libraries
+mkdir -p $OPENSHIFT_MARIADB_DIR/usr/lib/
+ln -s $OPENSHIFT_MARIADB_DIR/versions/$version/galera $OPENSHIFT_MARIADB_DIR/usr/lib/galera
+ln -s $OPENSHIFT_MARIADB_DIR/versions/$version/mariadb $OPENSHIFT_MARIADB_DIR/usr/mariadb
+
+# replace patched mysqldump file
+mv $OPENSHIFT_MARIADB_DIR/usr/mariadb/bin/wsrep_sst_mysqldump $OPENSHIFT_MARIADB_DIR/usr/mariadb/bin/wsrep_sst_mysqldump.bak
+ln -s $OPENSHIFT_MARIADB_DIR/versions/$version/wsrep_sst_mysqldump $OPENSHIFT_MARIADB_DIR/usr/mariadb/bin/wsrep_sst_mysqldump

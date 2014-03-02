@@ -8,7 +8,7 @@ Source-Url: https://github.com/andrewklau/openshift-galera-mariadb/archive/maste
 Version: '5.5.34'
 Versions:
 - '5.5.34'
-Cartridge-Version: 0.0.1
+Cartridge-Version: 1.0.0
 Cartridge-Vendor: andrewklau
 License: GPL
 Vendor: MariaDB Foundation

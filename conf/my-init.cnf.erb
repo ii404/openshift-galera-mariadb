@@ -8,7 +8,7 @@
 
 [mysqld]
 datadir=<%= ENV['OPENSHIFT_MARIADB_DIR'] %>/data/
-basedir=<%= ENV['OPENSHIFT_MARIADB_DIR'] %>/binaries/mariadb/
+basedir=<%= ENV['OPENSHIFT_MARIADB_DIR'] %>/usr/mariadb/
 socket=<%= ENV['OPENSHIFT_MARIADB_DB_SOCKET'] %>
 pid-file=<%= ENV['OPENSHIFT_MARIADB_DIR'] %>/pid/mariadb.pid
 user=<%= ENV['USER'] %>

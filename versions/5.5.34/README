@@ -1,18 +1,19 @@
 # Following Folders Come From These Commands
-mkdir -p $OPENSHIFT_MARIADB_DIR/binaries/{mariadb,galera}
+mkdir -p $OPENSHIFT_MARIADB_DIR/versions/$version/{mariadb,galera}
 
 # grab the binary from mariadb.org mirror
 wget http://mirror.aarnet.edu.au/pub/MariaDB/mariadb-galera-5.5.34/kvm-bintar-hardy-amd64/mariadb-galera-5.5.34-linux-x86_64.tar.gz
 
 tar xzf mariadb-galera-5.5.34-linux-x86_64.tar.gz --strip-components=1 -C $OPENSHIFT_MARIADB_DIR/binaries/mariadb/
 
-# Lets try clean up the binary contents to quotas don't complain
-rm -rf $OPENSHIFT_MARIADB_DIR/binaries/mariadb/mysql-test
-rm -rf $OPENSHIFT_MARIADB_DIR/binaries/mariadb/sql-bench
-rm -rf $OPENSHIFT_MARIADB_DIR/binaries/mariadb/man
+# Lets try clean up the binary contents so openshift quotas don't complain (there's over 8000 files)
+rm -rf $OPENSHIFT_MARIADB_DIR/versions/$version/mariadb/mysql-test
+rm -rf $OPENSHIFT_MARIADB_DIR/versions/$version/mariadb/sql-bench
+rm -rf $OPENSHIFT_MARIADB_DIR/versions/$version/mariadb/man
 
 # Lets grab galera
-cd $OPENSHIFT_MARIADB_DIR/galera
+# Currently mariadb 5.5.34 requires galera<24.x.x
+cd $OPENSHIFT_MARIADB_DIR/versions/$version/galera
 wget https://launchpad.net/galera/2.x/23.2.7/+download/galera-23.2.7-1.rhel6.x86_64.rpm
 rpm2cpio galera-23.2.7-1.rhel6.x86_64.rpm | cpio -idmv
 
