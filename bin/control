@@ -87,8 +87,8 @@ then
     # Doing a comparrison of lowest gears may not be ideal because of gears being removed
     # Relying on consistency with hooks may also be more risky
     # In most cases, there will be a index=0 and that'll start first
-    if [ -f $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_INDEX ]; then
-    wait_timer=( `cat $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_INDEX` )
+    if [ -f $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_CLUSTER_INDEX ]; then
+    wait_timer=( `cat $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_CLUSTER_INDEX` )
 
     # Sometimes we may end up with two gears at 0
     wait_timer=$(($wait_timer+1))
@@ -102,7 +102,7 @@ then
     active_gears=(`cat $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_GALERA_GEARS`)
     online_gears=''
 
-	for i in {1..$wait_timer}
+	for w in {1..$wait_timer}
 	do
 	    for i in ${active_gears[@]}; 
 	    do 
@@ -131,6 +131,7 @@ then
 		break
 	    fi
 
+	    echo "Itteration $w - going to sleep"
             sleep 1
 	done
 
@@ -180,7 +181,7 @@ then
     wait_for_mysqld_availability
 
     # Store the wsrep_index (note this is dynamic)
-    echo "SHOW STATUS LIKE 'wsrep%';" | $OPENSHIFT_MARIADB_DIR/usr/mariadb/bin/mysql -u root -S $OPENSHIFT_MARIADB_DB_SOCKET -u $OPENSHIFT_MARIADB_DB_USERNAME -p$OPENSHIFT_MARIADB_DB_PASSWORD | grep wsrep_local_index | grep -o "[0-9]"  | cut -c1-2 > $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_INDEX
+    echo "SHOW STATUS LIKE 'wsrep%';" | $OPENSHIFT_MARIADB_DIR/usr/mariadb/bin/mysql -u root -S $OPENSHIFT_MARIADB_DB_SOCKET -u $OPENSHIFT_MARIADB_DB_USERNAME -p$OPENSHIFT_MARIADB_DB_PASSWORD | grep wsrep_local_index | grep -o "[0-9]"  | cut -c1-2 > $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_CLUSTER_INDEX
 
 
   else
