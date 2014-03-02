@@ -123,9 +123,6 @@ then
 		sleep 10
 	done
 
-	# Just in case! Safe>Split-Brain
-	sleep `shuf -i 5-20 -n 1`
-
     # Build up our array of online gears
     online_gears=''
     for i in ${active_gears[@]}; 
