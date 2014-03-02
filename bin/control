@@ -72,9 +72,6 @@ function init_db {
 	fi
 }
 
-
-# TODO: account for standalone scenario
-# TODO: source user hooks?
 # Start mysqld and block until it comes up.
 function start {
 
@@ -85,7 +82,7 @@ then
     echo "Starting MariaDB cartridge"
     oo-erb $OPENSHIFT_MARIADB_DIR/conf/my.cnf.erb.hidden > $OPENSHIFT_MARIADB_DIR/conf/my.cnf
     
-    # Dirty check to see if other hosts are up
+    # Quick check to see if other hosts are up
     active_gears=(`cat $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_GALERA_GEARS`)
     online_gears=''
     for i in ${active_gears[@]}; 
@@ -95,15 +92,16 @@ then
 	then
 		continue
 	fi
-	# test if host is accessible (nc not available)
+	# test if other gears are accessible (nc not available)
 	# if nc -w 5 $(echo $i | tr ":" "\n") 2>/dev/null
+
+	# test if other gears are accessible
 	echo "quit" | telnet $(echo $i | tr ":" "\n") | grep Connected > /dev/null 2>&1
 	if [ "$?" -ne "1" ]; #Ok
 	then
 		online_gears="$online_gears,$i"
 	else
-		# Not sure if this will report to the user...
-		echo -e "Warning: $i is not responding! The node which hosts this gear may be offline - please contact your administrator."
+		client_result "Warning: $i is not responding! The node which hosts this gear may be offline - ignore this message if you're just starting the cluster."
 	fi
     done
         
