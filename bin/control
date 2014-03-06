@@ -29,7 +29,7 @@ function is_running {
 function init_db {
 
 	# Hooks should be doing all the checks, but we'll do one last test.
-	if fgrep -q "2" $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_INIT_DB
+	if [[ "2" == "$(cat $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_INIT_DB)" ]]
 	then
 
 	## 
@@ -76,13 +76,13 @@ function init_db {
 function start {
 
 # Hooks should be doing all the checks, but we'll do one last test.
-if fgrep -q "3" $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_INIT_DB
+if [[ "3" == "$(cat $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_INIT_DB)" ]]
 then
   if ! is_running; then
     echo "Starting MariaDB cartridge"
     oo-erb $OPENSHIFT_MARIADB_DIR/conf/my.cnf.erb.hidden > $OPENSHIFT_MARIADB_DIR/conf/my.cnf
     
-    active_gears=(`cat $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_GALERA_GEARS`)
+    active_gears="$(cat $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_GALERA_GEARS)"
 
     # Sort the array so everyone has a standard
     declare -a sortarray
@@ -149,7 +149,7 @@ then
     cd $OPENSHIFT_MARIADB_DIR/usr/mariadb
     
     # Remove the leading , (if exists)
-    online_gears=`echo $online_gears | sed 's/^,//'`
+    online_gears="$(echo $online_gears | sed 's/^,//')"
 
     # Generate the dynamic wsrep_cluster_addresses (none prints out as 1)
     if [ `echo $online_gears | sed 's/[^,]//g' | wc -c` -lt 2 ] && [[ -z "$online_gears" ]];

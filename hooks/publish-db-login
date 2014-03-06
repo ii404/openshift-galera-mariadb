@@ -1,13 +1,13 @@
 #!/bin/bash
 
 # If we're a new cluster, broadcast our initial randomly generated passwords
-if [ -n "`grep '0' $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_INIT_DB`" ] && [ -f $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_DB_TEMP ]
+if [[ "0" == "$(cat $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_INIT_DB)" ]] && [ -f $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_DB_TEMP ]
 then
 	# Broadcast our generated login details
 	echo "OPENSHIFT_MARIADB_DB_LOGIN=`cat $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_DB_TEMP`"
 
 # Only broadcast our username and password if we're sitting at 3
-elif [ -n "`grep '3' $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_INIT_DB`" ]
+elif [[ "3" == "$(cat $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_INIT_DB)" ]]
 then
 	echo "OPENSHIFT_MARIADB_DB_LOGIN=`cat $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_DB_USERNAME`:`cat $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_DB_PASSWORD`"
 

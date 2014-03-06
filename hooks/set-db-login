@@ -51,7 +51,7 @@ for arg in ${@:4}; do
 	fi
 	
 	# We only need to build the array if we're db-init=0
-	if fgrep -q "0" $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_INIT_DB
+	if [[ "0" == "$(cat $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_INIT_DB)" ]]
 	then
 
 		# Build our array of user:passwords
@@ -74,7 +74,7 @@ for arg in ${@:4}; do
 
 	# This should only be running if this is a new gear joining the cluster
 	# 2 = waiting for password
-	if fgrep -q "2" $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_INIT_DB
+	if [[ "2" == "$(cat $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_INIT_DB)" ]]
 	then
 
 		# Split the addr string into an array - we should be safe to grab the last addr submitted to us
@@ -106,7 +106,7 @@ for arg in ${@:4}; do
 done
 
 # if INIT_DB status is 0 - only the first 3 gears will be INI_DB=0 because db-init hook is run first
-if fgrep -q "0" $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_INIT_DB
+if [[ "0" == "$(cat $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_INIT_DB)" ]]
 then
 
 	# Check we meet the minimum quorum size

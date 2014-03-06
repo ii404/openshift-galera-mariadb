@@ -52,6 +52,11 @@ Dot Point Logic:
 - > Whichever gear has the lowest value will get a head start to start the cluster
 - > The other two gears will wait for the first one to complete, before joining the cluster
 
+**Race Conditions Prevention**
+
+- Control start script, will delay the start of the cluster unless we can see that other gears are online.
+- In the case for all gears being resumed at the same time, we try to delay them and only start when they match their own address within the loop.
+
 **Example Scenarios:**
 
 - 3 gears started per manifest's min3. 

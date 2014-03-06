@@ -117,7 +117,7 @@ done
 ##
 
 # Check if DB is ready for init, 0=notready, 1=ready, 2=new_gear, 3=initialized
-if fgrep -q "1" $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_INIT_DB
+if [[ "1" == "$(cat $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_INIT_DB)" ]]
 then
 	# Check if the database has been initialized
 	total_hosts=( `cat $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_NODE_GEARS` )
@@ -171,7 +171,7 @@ then
 		fi
 	fi
 # Joining a new gear to the cluster
-elif fgrep -q "2" $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_INIT_DB
+elif [[ "2" == "$(cat $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_INIT_DB)" ]]
 then
 	if [ ! -s $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_DB_USERNAME ] || [ ! -s $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_DB_PASSWORD ]
 	then
