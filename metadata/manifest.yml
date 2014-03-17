@@ -69,6 +69,8 @@ Subscribes:
     Type: NET_TCP:db-login
   set-mariadb-node:
     Type: NET_TCP:mariadb-cluster
+  set-haproxy:
+    Type: NET_TCP:haproxy
 Scaling:
   Min: 3
   Max: -1
@@ -88,5 +90,5 @@ Endpoints:
   Protocols:
   - mysql
   - galera
-  - rsync
+  - mysqldump
 Install-Build-Required: false
