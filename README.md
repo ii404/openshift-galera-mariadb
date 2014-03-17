@@ -2,7 +2,7 @@
 
 This is a WIP MariaDB Galera cartridge for OpenShift
 
-**Status:** ITS WORKING!!!!
+**Status:** ITS WORKING!!!! be warned there is no proper race condition prevention should all your gears fail at the same time. This will create a split-brain condition.. I'm currently working on a solution along side the haproxy implementation https://github.com/andrewklau/openshift-haproxy-galera-mariadb
 
 **What's Different:**
 - MariaDB Galera cluster requires 1 extra ports (galera - 4567) this is handled by hooks to save them as env variables to be shared across the cluster.
