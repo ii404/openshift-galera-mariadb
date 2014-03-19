@@ -4,11 +4,11 @@ This is a WIP OpenShift cartridge which will give you the end result of a 3 gear
 
 **Quick Steps:**
 
-``
+```
 rhc -s app create mariadb php-5.3 # or any other web cartridge (it must be a scaled cartridge)
 rhc cartridge add https://raw.github.com/andrewklau/openshift-galera-mariadb/master/metadata/manifest.yml -a mariadb
 rhc app show mariadb --gears
-``
+```
 
 Now you can ssh into your gears and you'll see your lovely lovely mariadb cluster connected and waiting to be thrashed with load.
 
