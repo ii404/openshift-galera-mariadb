@@ -7,14 +7,6 @@ case "$1" in
     version="$2"
 esac
 
-# Generate username, password, and db name and create env variables
-echo 'Generating username and password'
-
-username=$(generate_username)
-password=$(generate_password)
-
-echo "$username:$password" > $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_DB_TEMP
-
 echo 'Bootstrap MariaDB'
 # Setup the my-cnf init file
 oo-erb $OPENSHIFT_MARIADB_DIR/conf/my-init.cnf.erb.hidden > $OPENSHIFT_MARIADB_DIR/conf/my.cnf

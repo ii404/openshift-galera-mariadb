@@ -54,23 +54,13 @@ Provides:
 - MariaDB-Galera-server
 - MariaDB-client
 Publishes:
-  publish-db-init:
-    Type: NET_TCP:db-init
-  publish-db-login:
-    Type: NET_TCP:db-login
   publish-mariadb-node:
     Type: NET_TCP:mariadb-cluster
-  publish-db-connection-info:
-    Type: ENV:NET_TCP:db:connection-info
 Subscribes:
-  set-db-init:
-    Type: NET_TCP:db-init
-  set-db-login:
-    Type: NET_TCP:db-login
-  set-mariadb-node:
-    Type: NET_TCP:mariadb-cluster
   set-haproxy:
     Type: NET_TCP:haproxy
+  set-db-login:
+    Type: NET_TCP:db-login
 Scaling:
   Min: 3
   Max: -1

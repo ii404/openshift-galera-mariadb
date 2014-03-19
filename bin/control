@@ -29,7 +29,7 @@ function is_running {
 function init_db {
 
 	# Hooks should be doing all the checks, but we'll do one last test.
-	if [[ "2" == "$(cat $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_INIT_DB)" ]]
+	if [ ! -f $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_DB_INIT ]
 	then
 
 	## 
@@ -65,13 +65,12 @@ function init_db {
 	grant all on *.* to '$username'@'%' identified by '$password' with grant option;
 	flush privileges;" | ./bin/mysql -u root -S ${socket_file} mysql > /dev/null || error "Failed to setup initial root user" 187
 
+	# Create haproxy user for the alive check
 	echo "
 	GRANT ALL ON *.* to 'haproxy'@'%' IDENTIFIED BY ''; flush privileges;" | ./bin/mysql -u root -S ${socket_file} mysql > /dev/null || error "Failed to create haproxy user" 187
 
-	# DB-INIT Complete
-	echo "3" > $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_INIT_DB
-
-	# Check init_db
+	# This should touch as root, which should prevent any future snoopy human mistakes
+	touch $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_DB_INIT
 	fi
 }
 
@@ -79,63 +78,25 @@ function init_db {
 function start {
 
 # Hooks should be doing all the checks, but we'll do one last test.
-if [[ "3" == "$(cat $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_INIT_DB)" ]]
+if [ -f $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_DB_INIT ]
 then
   if ! is_running; then
     echo "Starting MariaDB cartridge"
     oo-erb $OPENSHIFT_MARIADB_DIR/conf/my.cnf.erb.hidden > $OPENSHIFT_MARIADB_DIR/conf/my.cnf
     
-    active_gears="$(cat $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_GALERA_GEARS)"
-
-    # Sort the array so everyone has a standard
-    declare -a sortarray
-    # Use a temp file 
-    echo '' > $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_TEMP_ARRAY
-    for i in ${active_gears[@]}; do
-         echo $i >> $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_TEMP_ARRAY
-        `sort $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_TEMP_ARRAY -o $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_TEMP_ARRAY`
-    done
-
-    while read line; do
-        sortarray=(${sortarray[@]} $line)
-    done < $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_TEMP_ARRAY
-
-	# Loop through our newly sorted array
-	for i in ${sortarray[@]}; 
-	do 
-		# Ignore own host
-		if [ "$OPENSHIFT_GEAR_DNS:$OPENSHIFT_MARIADB_NODE_GALERA_PORT_1" == $i ] 
-		then
-			# We are matched
-			echo "We matched ourselves in the array"
-			break
-		fi
-		# test if other gears are accessible (nc not available)
-		# if nc -w 5 $(echo $i | tr ":" "\n") 2>/dev/null
-
-		# test if other gears are accessible
-		echo "quit" | telnet $(echo $i | tr ":" "\n") | grep Connected > /dev/null 2>&1
-		if [ "$?" -ne "1" ]; #Ok
-		then
-			echo "Someone else is alive in the cluster"
-			# If anyone else is online, lets break from the loop
-			break
-		fi
-		
-		# Wait for our turn
-		sleep 15
-	done
+    active_gears="$(curl $OPENSHIFT_MARIADB_HAPROXY_URL/OPENSHIFT_MARIADB_NODE_GEARS)"
+    master_gear="$(curl $OPENSHIFT_MARIADB_HAPROXY_URL/OPENSHIFT_MARIADB_MASTER_GEAR)"
 
     # Build up our array of online gears
     online_gears=''
     for i in ${active_gears[@]}; 
     do 
 	# Ignore own host
-	if [ "$OPENSHIFT_GEAR_DNS:$OPENSHIFT_MARIADB_NODE_GALERA_PORT_1" == $i ] 
+	if [ "$OPENSHIFT_GEAR_DNS:$OPENSHIFT_MARIADB_DB_PROXY_PORT" == $i ] 
 	then
 		continue
 	fi
-	# test if other gears are accessible (nc not available)
+	# test if other gears are accessible
 	# if nc -w 5 $(echo $i | tr ":" "\n") 2>/dev/null
 
 	# test if other gears are accessible
@@ -143,9 +104,6 @@ then
 	if [ "$?" -ne "1" ]; #Ok
 	then
 		online_gears="$online_gears,$i"
-	else
-		client_result "Warning: $i is not responding! The node which hosts this gear may be offline - ignore this message if you're just starting the cluster."
-	fi
     done
         
     # We MUST run mysqld_safe from this dir or else it will fail
