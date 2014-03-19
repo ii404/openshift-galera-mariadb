@@ -19,7 +19,6 @@ for arg in ${@:4}; do
 	gear=$(echo "$arg" | cut -f 1 -d '=')
 	addr=$(echo "$arg" | cut -f 3 -d '=')
 
-	# Set passwords to initialized, we upgrade but never downgrade the db-init
 	echo $addr > $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_HAPROXY_URL
 
 done

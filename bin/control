@@ -65,6 +65,9 @@ function init_db {
 	grant all on *.* to '$username'@'%' identified by '$password' with grant option;
 	flush privileges;" | ./bin/mysql -u root -S ${socket_file} mysql > /dev/null || error "Failed to setup initial root user" 187
 
+	echo "
+	GRANT ALL ON *.* to 'haproxy'@'%' IDENTIFIED BY ''; flush privileges;" | ./bin/mysql -u root -S ${socket_file} mysql > /dev/null || error "Failed to create haproxy user" 187
+
 	# DB-INIT Complete
 	echo "3" > $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_INIT_DB
 
