@@ -80,8 +80,8 @@ function loop_start {
 	while [[ `echo $online_gears | sed 's/[^,]//g' | wc -c` -lt 2 && $online_gears == '' ]]; do
 
 		# TODO: add check for http failure codes
-		active_gears="$(curl $OPENSHIFT_MARIADB_HAPROXY_URL/OPENSHIFT_MARIADB_NODE_GEARS)"
-		master_gear="$(curl $OPENSHIFT_MARIADB_HAPROXY_URL/OPENSHIFT_MARIADB_MASTER_GEAR)"
+		active_gears="$(curl $OPENSHIFT_HAPROXY_URL/OPENSHIFT_MARIADB_NODE_GEARS)"
+		master_gear="$(curl $OPENSHIFT_HAPROXY_URL/OPENSHIFT_MARIADB_MASTER_GEAR)"
 
 		# Loop through array of active gears
 		for i in ${active_gears[@]}; 
