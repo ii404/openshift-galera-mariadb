@@ -43,8 +43,8 @@ function init_db {
 
 	dbname=$OPENSHIFT_APP_NAME
 	socket_file=$OPENSHIFT_MARIADB_DB_SOCKET
-	username=( `cat $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_DB_USERNAME` )
-	password=( `cat $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_DB_PASSWORD` )
+	username=$OPENSHIFT_MARIADB_DB_USERNAME
+	password=$OPENSHIFT_MARIADB_DB_PASSWORD
 
 	# We MUST run mysql from this dir or else it will fail
         cd $OPENSHIFT_MARIADB_DIR/usr/mariadb
