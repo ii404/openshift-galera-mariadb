@@ -81,8 +81,8 @@ function loop_start {
 	while [[ `echo $online_gears | sed 's/[^,]//g' | wc -c` -lt 2 && $online_gears == '' ]]; do
 
 		# TODO: add check for http failure codes
-		active_gears="$(curl $OPENSHIFT_HAPROXY_URL/OPENSHIFT_MARIADB_GALERA_GEARS)"
-		master_gear="$(curl $OPENSHIFT_HAPROXY_URL/OPENSHIFT_MARIADB_MASTER_GEAR)"
+		active_gears="$(curl --silent $OPENSHIFT_HAPROXY_URL/OPENSHIFT_MARIADB_NODE_GEARS)"
+		master_gear="$(curl --silent $OPENSHIFT_HAPROXY_URL/OPENSHIFT_MARIADB_MASTER_GEAR)"
 
 		# convert to arry
 		arr=($active_gears)
@@ -90,7 +90,7 @@ function loop_start {
 		for i in ${arr[@]}; 
 		do 
 			# Ignore own host
-			if [ "$OPENSHIFT_GEAR_DNS:$OPENSHIFT_MARIADB_NODE_GALERA_PORT_1" == $i ] 
+			if [ "$OPENSHIFT_GEAR_DNS:$OPENSHIFT_MARIADB_DB_PROXY_PORT" == $i ] 
 			then
 				continue
 			fi
