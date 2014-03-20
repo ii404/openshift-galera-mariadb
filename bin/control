@@ -43,8 +43,8 @@ function init_db {
 
 	dbname=$OPENSHIFT_APP_NAME
 	socket_file=$OPENSHIFT_MARIADB_DB_SOCKET
-	username=$OPENSHIFT_MARIADB_DB_USERNAME
-	password=$OPENSHIFT_MARIADB_DB_PASSWORD
+	username=( `cat $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_DB_USERNAME` )
+	password=( `cat $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_DB_PASSWORD` )
 
 	# We MUST run mysql from this dir or else it will fail
         cd $OPENSHIFT_MARIADB_DIR/usr/mariadb
@@ -57,18 +57,23 @@ function init_db {
 
 	# Drop the test database and create our application's database
 	echo "drop database test;
-	create database \`${dbname}\` DEFAULT CHARACTER SET utf8 DEFAULT COLLATE utf8_general_ci;" | ./bin/mysql -u root -S ${socket_file} > /dev/null || error 'Failed to create database' 188
+	create database \`${dbname}\` DEFAULT CHARACTER SET utf8 DEFAULT COLLATE utf8_general_ci;" | ./bin/mysql -u root -S ${socket_file} > $OPENSHIFT_MARIADB_DIR/mysqllog #> /dev/null || error 'Failed to create database' 188
 
 	# Delete the test user and create our admin user from the generated_username and generated_password
 	echo "                                  
 	delete from user;
-	grant all on *.* to '$username'@'%' identified by '$password' with grant option; flush privileges;" | ./bin/mysql -u root -S ${socket_file} mysql > /dev/null || error "Failed to setup initial root user" 187
+	grant all on *.* to '$username'@'%' identified by '$password' with grant option; flush privileges;" | ./bin/mysql -u root -S ${socket_file} mysql > $OPENSHIFT_MARIADB_DIR/mysqllog  #> /dev/null || error "Failed to setup initial root user" 187
 
 	# Create haproxy user for the alive check
 	echo "
-	GRANT ALL ON *.* to 'haproxy'@'%' IDENTIFIED BY ''; " | ./bin/mysql -u $username -p$password -S ${socket_file} mysql > /dev/null || error "Failed to create haproxy user" 187
+	GRANT ALL ON *.* to 'haproxy'@'%' IDENTIFIED BY ''; " | ./bin/mysql -u $username -p$password -S ${socket_file} mysql > $OPENSHIFT_MARIADB_DIR/mysqllog  #> /dev/null || error "Failed to create haproxy user" 187
 
 	touch $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_DB_INIT
+	sleep 10
+
+	# Restart into cluster
+	$OPENSHIFT_MARIADB_DIR/bin/control restart
+
 	fi
 }
 
@@ -153,7 +158,6 @@ function start {
 	if [ ! -f $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_DB_INIT ]
 	then
 		init_db
-		restart
 	fi
 
 	if ! is_running; then
