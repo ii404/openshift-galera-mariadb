@@ -155,22 +155,23 @@ function start {
 	fi
 
 	# Hooks should be doing all the checks, but we'll do one last test.
-	if [ ! -f $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_DB_INIT ]
+	if [ -f $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_DB_INIT ]
 	then
-		init_db
-	fi
+		if ! is_running; then
+			echo "Starting MariaDB cartridge.."
+			oo-erb $OPENSHIFT_MARIADB_DIR/conf/my.cnf.erb.hidden > $OPENSHIFT_MARIADB_DIR/conf/my.cnf
 
-	if ! is_running; then
-		echo "Starting MariaDB cartridge.."
-		oo-erb $OPENSHIFT_MARIADB_DIR/conf/my.cnf.erb.hidden > $OPENSHIFT_MARIADB_DIR/conf/my.cnf
+			touch $OPENSHIFT_MARIADB_DIR/starting
+			echo "we will continue to load in the background.."
+			loop_start
 
-		touch $OPENSHIFT_MARIADB_DIR/starting
-		echo "we will continue to load in the background.."
-		loop_start
-
+		else
+			echo "MariaDB already running" 1>&2
+		fi
 	else
-		echo "MariaDB already running" 1>&2
+		echo "db_init hasn't been run yet"	
 	fi
+
 }
 
 
