@@ -76,11 +76,11 @@ function init_db {
 function loop_start {
 
 	# Build up our array of online gears
-	online_gears=''
+	online_gears=''; i=0
 	while [[ `echo $online_gears | sed 's/[^,]//g' | wc -c` -lt 2 && $online_gears == '' ]]; do
 
 		# TODO: add check for http failure codes
-		active_gears="$(curl $OPENSHIFT_HAPROXY_URL/OPENSHIFT_MARIADB_NODE_GEARS)"
+		active_gears="$(curl $OPENSHIFT_HAPROXY_URL/OPENSHIFT_MARIADB_GALERA_GEARS)"
 		master_gear="$(curl $OPENSHIFT_HAPROXY_URL/OPENSHIFT_MARIADB_MASTER_GEAR)"
 
 		# convert to arry
@@ -93,7 +93,7 @@ function loop_start {
 			then
 				continue
 			fi
-			# test if other gears are accessible
+			# TODO: check if telnet or nc are available
 			# if nc -w 5 $(echo $i | tr ":" "\n") 2>/dev/null
 			# test if other gears are accessible
 			echo "quit" | telnet $(echo $i | tr ":" "\n") | grep Connected > /dev/null 2>&1
@@ -103,10 +103,7 @@ function loop_start {
 			fi
 		done
 
-		# Remove the leading , (if exists)
-		online_gears="$(echo $online_gears | sed 's/^,//')"
-
-		if [ "$OPENSHIFT_GEAR_DNS:$OPENSHIFT_MARIADB_DB_PROXY_PORT" == $master_gear ];
+		if [[ "$OPENSHIFT_GEAR_DNS:$OPENSHIFT_MARIADB_NODE_GALERA_PORT_1" == $master_gear && `echo $online_gears | sed 's/[^,]//g' | wc -c` -gt 2  ]];
 		then
 			# We MUST run mysqld_safe from this dir or else it will fail
 			cd $OPENSHIFT_MARIADB_DIR/usr/mariadb
@@ -119,9 +116,18 @@ function loop_start {
 			exit 0
 		fi
 
-		echo "Waiting for initial host.."
-		sleep 120
+		# If it keeps failing, slow down the attempts to an extent
+		if [ $i -lt 200 ]; then
+			i=$(($i+10))
+		fi
+
+		echo "Sleep for a bit while we wait for the initial host.."
+		sleep $(($i*10))
 	done
+
+	# Remove the leading , (this is what makes our loop end)
+	online_gears="$(echo $online_gears | sed 's/^,//')"
+
 
 	# We MUST run mysqld_safe from this dir or else it will fail
 	cd $OPENSHIFT_MARIADB_DIR/usr/mariadb
