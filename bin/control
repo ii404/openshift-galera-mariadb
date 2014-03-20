@@ -50,7 +50,7 @@ function init_db {
         cd $OPENSHIFT_MARIADB_DIR/usr/mariadb
 	
 	# Start MariaDB (standalone)
-	./bin/mysqld --defaults-file=$OPENSHIFT_MARIADB_DIR/conf/my.cnf > /dev/null 2>&1 &
+	./bin/mysqld-safe --defaults-file=$OPENSHIFT_MARIADB_DIR/conf/my.cnf > /dev/null 2>&1 &
 
 	# Wait for MariaDB to Start
 	sleep 15
@@ -166,7 +166,7 @@ function start {
 
 		touch $OPENSHIFT_MARIADB_DIR/starting
 		echo "we will continue to load in the background.."
-		loop_start &
+		loop_start
 
 	else
 		echo "MariaDB already running" 1>&2
