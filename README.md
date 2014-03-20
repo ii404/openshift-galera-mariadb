@@ -1,6 +1,6 @@
 # OpenShift Galera MariaDB Cartridge
 
-This is an OpenShift cartridge which will give you the end result of a 3 gear MariaDB Galera cluster, it can technically scale up to as many gears as possible (within reason).
+This is an OpenShift cartridge which will give you the end result of a 3 gear MariaDB Galera cluster, it can technically scale up to as many gears as possible (within reason). It requires this HAProxy cartridge [1]
 
 **Quick Steps:**
 
@@ -32,4 +32,6 @@ Now you can ssh into your gears and you'll see your lovely lovely mariadb cluste
 
 **Feedback:**
 
-I appreciate any feedback and any code comments you have. If you see something absolutely horrible, please tell me so I can improve :)
+I'm not a developer, but I'm learning so I appreciate any feedback and any code comments you have. If you see something absolutely horrible, please tell me so I can improve :)
+
+[1] https://github.com/andrewklau/openshift-haproxy-galera-mariadb
