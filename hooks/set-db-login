@@ -32,9 +32,9 @@ for arg in ${@:4}; do
 
 		# Initialize our DB
 		$OPENSHIFT_MARIADB_DIR/bin/control init-db
+		sleep 5
 
 		# Start our newly isntalled cluster (background)
-		sleep 5
 		$OPENSHIFT_MARIADB_DIR/bin/control restart &
 	fi
 

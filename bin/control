@@ -89,7 +89,7 @@ function loop_start {
 		for i in ${arr[@]}; 
 		do 
 			# Ignore own host
-			if [ "$OPENSHIFT_GEAR_DNS:$OPENSHIFT_MARIADB_DB_PROXY_PORT" == $i ] 
+			if [ "$OPENSHIFT_GEAR_DNS:$OPENSHIFT_MARIADB_NODE_GALERA_PORT_1" == $i ] 
 			then
 				continue
 			fi
@@ -103,7 +103,7 @@ function loop_start {
 			fi
 		done
 
-		if [[ "$OPENSHIFT_GEAR_DNS:$OPENSHIFT_MARIADB_NODE_GALERA_PORT_1" == $master_gear && `echo $online_gears | sed 's/[^,]//g' | wc -c` -gt 2  ]];
+		if [[ "$OPENSHIFT_GEAR_DNS:$OPENSHIFT_MARIADB_DB_PROXY_PORT" == $master_gear && `echo $online_gears | sed 's/[^,]//g' | wc -c` -gt 2  ]];
 		then
 			# We MUST run mysqld_safe from this dir or else it will fail
 			cd $OPENSHIFT_MARIADB_DIR/usr/mariadb
