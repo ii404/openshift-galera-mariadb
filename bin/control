@@ -83,8 +83,10 @@ function loop_start {
 		active_gears="$(curl $OPENSHIFT_HAPROXY_URL/OPENSHIFT_MARIADB_NODE_GEARS)"
 		master_gear="$(curl $OPENSHIFT_HAPROXY_URL/OPENSHIFT_MARIADB_MASTER_GEAR)"
 
+		# convert to arry
+		arr=($active_gears)
 		# Loop through array of active gears
-		for i in ${active_gears[@]}; 
+		for i in ${arr[@]}; 
 		do 
 			# Ignore own host
 			if [ "$OPENSHIFT_GEAR_DNS:$OPENSHIFT_MARIADB_DB_PROXY_PORT" == $i ] 
