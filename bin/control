@@ -69,7 +69,7 @@ function init_db {
 
 	# Create haproxy user for the alive check
 	echo "
-	grant all on *.* to 'haproxy'@'${haproxy}' IDENTIFIED BY ''; flush privileges;" | ./bin/mysql -u ${username} -p${password} -S ${socket_file} mysql > /dev/null || error "Failed to create haproxy user" 187
+	grant usage on *.* to 'haproxy'@'${haproxy}' IDENTIFIED BY ''; flush privileges;" | ./bin/mysql -u ${username} -p${password} -S ${socket_file} mysql > /dev/null || error "Failed to create haproxy user" 187
 
 	touch $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_DB_INIT
 

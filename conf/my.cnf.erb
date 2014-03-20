@@ -24,6 +24,7 @@ read_rnd_buffer_size = 256K
 net_buffer_length = 2K
 thread_stack = 256K
 lower_case_table_names = <%= ENV['OPENSHIFT_MARIADB_LOWER_CASE_TABLE_NAMES'] ? ENV['OPENSHIFT_MARIADB_LOWER_CASE_TABLE_NAMES'] : '0' %>
+max_connect_errors=100
 
 <%= ENV['OPENSHIFT_MARIADB_DEFAULT_STORAGE_ENGINE'] ? "default-storage-engine = #{ENV['OPENSHIFT_MARIADB_DEFAULT_STORAGE_ENGINE']}" : '' %>
 
