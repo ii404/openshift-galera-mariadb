@@ -38,6 +38,9 @@ for arg in ${@:4}; do
 		$OPENSHIFT_MARIADB_DIR/bin/control init-db
 		sleep 5
 
+		# Restart into cluster
+		$OPENSHIFT_MARIADB_DIR/bin/control restart
+
 	fi
 
 done

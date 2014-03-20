@@ -64,15 +64,14 @@ function init_db {
 	delete from user;
 	grant all on *.* to '$username'@'%' identified by '$password' with grant option; flush privileges;" | ./bin/mysql -u root -S ${socket_file} mysql > /dev/null || error "Failed to setup initial root user" 187
 
+	# Get HAProxy Hostname
+	haproxy=( `cat OPENSHIFT_HAPROXY_URL | awk -F/ '{print $3}' | awk -F: '{print $1}'` )
+
 	# Create haproxy user for the alive check
-	#echo "
-	#grant all on *.* to 'haproxy'@'%' IDENTIFIED BY ''; flush privileges;" | ./bin/mysql -u $username -p$password -S ${socket_file} mysql > /dev/null || error "Failed to create haproxy user" 187
+	echo "
+	grant all on *.* to 'haproxy'@'${haproxy}' IDENTIFIED BY ''; flush privileges;" | ./bin/mysql -u ${username} -p${password} -S ${socket_file} mysql > /dev/null || error "Failed to create haproxy user" 187
 
 	touch $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_DB_INIT
-	sleep 10
-
-	# Restart into cluster
-	$OPENSHIFT_MARIADB_DIR/bin/control restart
 
 	fi
 }
