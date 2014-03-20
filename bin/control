@@ -104,6 +104,7 @@ then
 	if [ "$?" -ne "1" ]; #Ok
 	then
 		online_gears="$online_gears,$i"
+	fi
     done
         
     # We MUST run mysqld_safe from this dir or else it will fail
