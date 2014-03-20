@@ -1,6 +1,6 @@
 # OpenShift Galera MariaDB Cartridge
 
-This is a WIP OpenShift cartridge which will give you the end result of a 3 gear MariaDB Galera cluster!
+This is an OpenShift cartridge which will give you the end result of a 3 gear MariaDB Galera cluster, it can technically scale up to as many gears as possible (within reason).
 
 **Quick Steps:**
 
@@ -31,4 +31,5 @@ Now you can ssh into your gears and you'll see your lovely lovely mariadb cluste
 - Add a wsrep_notify_cmd script to notify users if gears go down etc.
 
 **Feedback:**
+
 I appreciate any feedback and any code comments you have. If you see something absolutely horrible, please tell me so I can improve :)
