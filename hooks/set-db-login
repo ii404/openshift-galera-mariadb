@@ -27,8 +27,9 @@ for arg in ${@:4}; do
 
 		login_array=(${addr//:/ })
 
-		OPENSHIFT_MARIADB_DB_USERNAME=${login_array[0]}
-		OPENSHIFT_MARIADB_DB_PASSWORD=${login_array[1]}
+		# Export these vars for this session
+		export OPENSHIFT_MARIADB_DB_USERNAME=${login_array[0]}
+		export OPENSHIFT_MARIADB_DB_PASSWORD=${login_array[1]}
 
 		echo $OPENSHIFT_MARIADB_DB_USERNAME > $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_DB_USERNAME
 		echo $OPENSHIFT_MARIADB_DB_PASSWORD > $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_DB_PASSWORD
