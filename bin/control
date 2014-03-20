@@ -68,7 +68,6 @@ function init_db {
 	echo "
 	GRANT ALL ON *.* to 'haproxy'@'%' IDENTIFIED BY ''; " | ./bin/mysql -u $username -p$password -S ${socket_file} mysql > /dev/null || error "Failed to create haproxy user" 187
 
-	# This should touch as root, which should prevent any future snoopy human mistakes
 	touch $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_DB_INIT
 	fi
 }
@@ -154,6 +153,7 @@ function start {
 	if [ ! -f $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_DB_INIT ]
 	then
 		init_db
+		restart
 	fi
 
 	if ! is_running; then
