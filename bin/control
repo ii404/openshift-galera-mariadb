@@ -76,8 +76,7 @@ function init_db {
 function loop_start {
 
 	# Build up our array of online gears
-	online_gears=''; 
-	j=0; k=0
+	online_gears=''; j=0
 	while [[ `echo $online_gears | sed 's/[^,]//g' | wc -c` -lt 2 && $online_gears == '' ]]; do
 
 		# TODO: add check for http failure codes
@@ -118,12 +117,12 @@ function loop_start {
 		fi
 
 		# If it keeps failing, slow down the attempts to an extent
-		if [ $k -lt 30 ]; then
-			((k++))
+		if [ $j -lt 200 ]; then
+			j=$(($j+10))
 		fi
 
 		echo "Sleep for a bit while we wait for the initial host.."
-		sleep $(($j+$k*10))
+		sleep $(($j*10))
 	done
 
 	# Remove the leading , (this is what makes our loop end)
