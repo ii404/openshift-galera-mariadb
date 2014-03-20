@@ -62,8 +62,7 @@ function init_db {
 	# Delete the test user and create our admin user from the generated_username and generated_password
 	echo "                                  
 	delete from user;
-	grant all on *.* to '$username'@'%' identified by '$password' with grant option;
-	flush privileges;" | ./bin/mysql -u root -S ${socket_file} mysql > /dev/null || error "Failed to setup initial root user" 187
+	grant all on *.* to '$username'@'%' identified by '$password' with grant option;" | ./bin/mysql -u root -S ${socket_file} mysql > /dev/null || error "Failed to setup initial root user" 187
 
 	# Create haproxy user for the alive check
 	echo "
@@ -74,80 +73,108 @@ function init_db {
 	fi
 }
 
-# Start mysqld and block until it comes up.
-function start {
+function loop_start {
 
-# Hooks should be doing all the checks, but we'll do one last test.
-if [ -f $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_DB_INIT ]
-then
-  if ! is_running; then
-    echo "Starting MariaDB cartridge"
-    oo-erb $OPENSHIFT_MARIADB_DIR/conf/my.cnf.erb.hidden > $OPENSHIFT_MARIADB_DIR/conf/my.cnf
-    
-    active_gears="$(curl $OPENSHIFT_MARIADB_HAPROXY_URL/OPENSHIFT_MARIADB_NODE_GEARS)"
-    master_gear="$(curl $OPENSHIFT_MARIADB_HAPROXY_URL/OPENSHIFT_MARIADB_MASTER_GEAR)"
+	# Build up our array of online gears
+	online_gears=''
+	while [[ `echo $online_gears | sed 's/[^,]//g' | wc -c` -lt 2 && $online_gears == '' ]]; do
 
-    # Build up our array of online gears
-    online_gears=''
-    for i in ${active_gears[@]}; 
-    do 
-	# Ignore own host
-	if [ "$OPENSHIFT_GEAR_DNS:$OPENSHIFT_MARIADB_DB_PROXY_PORT" == $i ] 
-	then
-		continue
-	fi
-	# test if other gears are accessible
-	# if nc -w 5 $(echo $i | tr ":" "\n") 2>/dev/null
+		# TODO: add check for http failure codes
+		active_gears="$(curl $OPENSHIFT_MARIADB_HAPROXY_URL/OPENSHIFT_MARIADB_NODE_GEARS)"
+		master_gear="$(curl $OPENSHIFT_MARIADB_HAPROXY_URL/OPENSHIFT_MARIADB_MASTER_GEAR)"
 
-	# test if other gears are accessible
-	echo "quit" | telnet $(echo $i | tr ":" "\n") | grep Connected > /dev/null 2>&1
-	if [ "$?" -ne "1" ]; #Ok
-	then
-		online_gears="$online_gears,$i"
-	fi
-    done
-        
-    # We MUST run mysqld_safe from this dir or else it will fail
-    cd $OPENSHIFT_MARIADB_DIR/usr/mariadb
-    
-    # Remove the leading , (if exists)
-    online_gears="$(echo $online_gears | sed 's/^,//')"
+		# Loop through array of active gears
+		for i in ${active_gears[@]}; 
+		do 
+			# Ignore own host
+			if [ "$OPENSHIFT_GEAR_DNS:$OPENSHIFT_MARIADB_DB_PROXY_PORT" == $i ] 
+			then
+				continue
+			fi
+			# test if other gears are accessible
+			# if nc -w 5 $(echo $i | tr ":" "\n") 2>/dev/null
+			# test if other gears are accessible
+			echo "quit" | telnet $(echo $i | tr ":" "\n") | grep Connected > /dev/null 2>&1
+			if [ "$?" -ne "1" ]; #Ok
+			then
+				online_gears="$online_gears,$i"
+			fi
+		done
 
-    # Generate the dynamic wsrep_cluster_addresses (none prints out as 1)
-    if [ `echo $online_gears | sed 's/[^,]//g' | wc -c` -lt 2 ] && [[ -z "$online_gears" ]];
-    then
-    	echo 'Initial Startup (first host)'
-        ./bin/mysqld_safe --defaults-file=$OPENSHIFT_MARIADB_DIR/conf/my.cnf --wsrep_cluster_address='gcomm://' > /dev/null 2>&1 &
-    else
-    	echo 'Adding more hosts to the cluster'
-        ./bin/mysqld_safe --defaults-file=$OPENSHIFT_MARIADB_DIR/conf/my.cnf --wsrep_cluster_address="gcomm://$online_gears" > /dev/null 2>&1 &
-    fi
+		# Remove the leading , (if exists)
+		online_gears="$(echo $online_gears | sed 's/^,//')"
 
-    wait_for_mysqld_availability
+		if [ "$OPENSHIFT_GEAR_DNS:$OPENSHIFT_MARIADB_DB_PROXY_PORT" == $master_gear ];
+		then
+			# We MUST run mysqld_safe from this dir or else it will fail
+			cd $OPENSHIFT_MARIADB_DIR/usr/mariadb
 
-  else
-    echo "MariaDB already running" 1>&2
-  fi
-else
-  echo "db-init hasn't been executed yet!"
-fi
+			echo 'Starting up as the Initial Host..'
+			./bin/mysqld_safe --defaults-file=$OPENSHIFT_MARIADB_DIR/conf/my.cnf --wsrep_cluster_address='gcomm://' > /dev/null 2>&1 &
+			wait_for_mysqld_availability
+			rm -f $OPENSHIFT_MARIADB_DIR/starting
+	
+			exit 0
+		fi
+
+		echo "Waiting for initial host.."
+		sleep 120
+	done
+
+	# We MUST run mysqld_safe from this dir or else it will fail
+	cd $OPENSHIFT_MARIADB_DIR/usr/mariadb
+
+	echo 'Starting up to join the existing cluster..'
+	./bin/mysqld_safe --defaults-file=$OPENSHIFT_MARIADB_DIR/conf/my.cnf --wsrep_cluster_address="gcomm://$online_gears" > /dev/null 2>&1 &
+	wait_for_mysqld_availability
+	rm -f $OPENSHIFT_MARIADB_DIR/starting
+
+	exit 0
+
 }
 
+function start {
+
+	# prevent duplicate loops
+	if [ -f $OPENSHIFT_MARIADB_DIR/starting ]; then
+	    echo "Mariadb already trying to start.."
+	    exit 1
+	fi
+
+	# Hooks should be doing all the checks, but we'll do one last test.
+	if [ -f $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_DB_INIT ]
+	then
+	  if ! is_running; then
+	    echo "Starting MariaDB cartridge.."
+	    oo-erb $OPENSHIFT_MARIADB_DIR/conf/my.cnf.erb.hidden > $OPENSHIFT_MARIADB_DIR/conf/my.cnf
+
+	    touch $OPENSHIFT_MARIADB_DIR/starting
+	    echo "we will continue to load in the background.."
+	    loop_start &
+
+	  else
+	    echo "MariaDB already running" 1>&2
+	  fi
+	else
+	  echo "db-init hasn't been executed yet!"
+	fi
+}
+
+
 function wait_for_mysqld_availability {
-  test_select=${1:-false}
+	test_select=${1:-false}
 
-  for i in {1..30}; do
-    if is_running; then
-      if $test_select; then
-        run_sql 'select 1' 2> /dev/null && return 0
-      else
-        return 0
-      fi
-    fi
-
-    sleep 1
-  done
-  return 1
+	for i in {1..30}; do
+		if is_running; then
+			if $test_select; then
+				run_sql 'select 1' 2> /dev/null && return 0
+			else
+				return 0
+			fi
+		fi
+		sleep 1
+	done
+	return 1
 }
 
 function stop {

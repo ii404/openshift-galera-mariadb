@@ -14,6 +14,11 @@ for arg in ${@:4}; do
 	gear=$(echo "$arg" | cut -f 1 -d '=')
 	addr=$(echo "$arg" | cut -f 3 -d '=')
 
+	# ignore if empty
+	if [[ -z "$arg" ]]; then
+		continue
+	fi
+
 	# addr will have a format like this: 
 	# admin:pass
 	
@@ -25,6 +30,12 @@ for arg in ${@:4}; do
 		echo ${login_array[0]} > $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_DB_USERNAME
 		echo ${login_array[1]} > $OPENSHIFT_MARIADB_DIR/env/OPENSHIFT_MARIADB_DB_PASSWORD
 
+		# Initialize our DB
+		$OPENSHIFT_MARIADB_DIR/bin/control init-db
+
+		sleep 5;
+		# Start the cluster (background it as to not hold up the build process)
+		$OPENSHIFT_MARIADB_DIR/bin/control restart &
 	fi
 
 done
