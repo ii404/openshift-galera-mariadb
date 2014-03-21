@@ -34,4 +34,11 @@ Now you can ssh into your gears and you'll see your lovely lovely mariadb cluste
 
 I'm not a developer, but I'm learning so I appreciate any feedback and any code comments you have. If you see something absolutely horrible, please tell me so I can improve :)
 
+**Disclaimer:**
+- Normal disclaimer, I'm doing this for my own personal learning and gain, with the hopes that this will also help another. 
+- Possibly become something which will be used in production environments. 
+- However with the nature of database replication software, I'm not responssible for data loss or anything while using this cartridge. 
+- Although I've tried very hard to prevent all possible common pitfalls.
+
+
 [1] https://github.com/andrewklau/openshift-haproxy-galera-mariadb
