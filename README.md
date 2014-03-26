@@ -23,6 +23,7 @@ Now you can ssh into your gears and you'll see your lovely lovely mariadb cluste
 - Verify logic and possible loops or data corruption (I'd really appreciate a second pair of eyes)
 - Do the upgrade/snapshot/backup scripts
 - Improve HAProxy config files
+- Move more files to locked_files
 
 **Ideally:**
 - Setup proper version control so for nodes with the correct packages installed can get automatically updates (need more research)
@@ -39,6 +40,12 @@ I'm not a developer, but I'm learning so I appreciate any feedback and any code 
 - Possibly become something which will be used in production environments. 
 - However with the nature of database replication software, I'm not responssible for data loss or anything while using this cartridge. 
 - Although I've tried very hard to prevent all possible common pitfalls.
+
+**Kudos:**
+- warthog9@openshift-dev
+- jhonce@openshift-dev
+- blackdan@mariadb
+- mateus@getupcloud
 
 
 [1] https://github.com/andrewklau/openshift-haproxy-galera-mariadb
