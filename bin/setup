@@ -15,6 +15,7 @@ mv $OPENSHIFT_MARIADB_DIR/conf/my.cnf.erb $OPENSHIFT_MARIADB_DIR/conf/my.cnf.erb
 mv $OPENSHIFT_MARIADB_DIR/conf/my-init.cnf.erb $OPENSHIFT_MARIADB_DIR/conf/my-init.cnf.erb.hidden
 
 # Setup our binaries and libraries
+# TODO: verify this usr dir will get symlinked onto the node, or does it have to exist at an earlier stage
 mkdir -p $OPENSHIFT_MARIADB_DIR/usr/lib/
 ln -s $OPENSHIFT_MARIADB_DIR/versions/$version/galera $OPENSHIFT_MARIADB_DIR/usr/lib/galera
 ln -s $OPENSHIFT_MARIADB_DIR/versions/$version/mariadb $OPENSHIFT_MARIADB_DIR/usr/mariadb
