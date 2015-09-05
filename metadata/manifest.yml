@@ -62,7 +62,7 @@ Subscribes:
   set-db-login:
     Type: NET_TCP:db-login
 Scaling:
-  Min: 1
+  Min: 2
   Max: -1
 Endpoints:
 - Private-IP-Name: DB_HOST
